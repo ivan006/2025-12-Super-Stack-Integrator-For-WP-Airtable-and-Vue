@@ -62,6 +62,29 @@
             </q-card-section>
         </q-card>
 
+
+        <!-- Existing Bound Caches -->
+        <q-card flat bordered>
+            <q-card-section>
+
+                <div class="text-subtitle1 q-mb-md">
+                    Existing Bound Caches
+                </div>
+
+                <q-table flat bordered dense row-key="file" :rows="caches" :columns="columns"
+                    no-data-label="No bound caches found">
+                    <template v-slot:body-cell-actions="props">
+                        <q-td align="right">
+                            <q-btn size="sm" flat label="View" @click="viewCache(props.row.source_url)" />
+                        </q-td>
+                    </template>
+                </q-table>
+
+            </q-card-section>
+        </q-card>
+
+        
+
         <!-- Attachment Progress -->
         <q-card flat bordered class="q-mb-md">
             <q-card-section>
@@ -83,27 +106,6 @@
                         <img :src="img" style="width:120px;height:120px;object-fit:cover;border-radius:6px" />
                     </div>
                 </div>
-            </q-card-section>
-        </q-card>
-
-
-        <!-- Existing Bound Caches -->
-        <q-card flat bordered>
-            <q-card-section>
-
-                <div class="text-subtitle1 q-mb-md">
-                    Existing Bound Caches
-                </div>
-
-                <q-table flat bordered dense row-key="file" :rows="caches" :columns="columns"
-                    no-data-label="No bound caches found">
-                    <template v-slot:body-cell-actions="props">
-                        <q-td align="right">
-                            <q-btn size="sm" flat label="View" @click="viewCache(props.row.source_url)" />
-                        </q-td>
-                    </template>
-                </q-table>
-
             </q-card-section>
         </q-card>
 
