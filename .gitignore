@@ -34,3 +34,5 @@ yarn-error.log*
 
 # .env.development
 # .env.production
+/public/data-cache/cache
+public/data-cache/config.json
