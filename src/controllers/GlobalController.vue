@@ -1,5 +1,6 @@
 <template>
   <q-layout view="lHh Lpr lFf">
+
     <q-header elevated>
       <q-toolbar>
         <q-toolbar-title>
@@ -12,15 +13,21 @@
       <q-list padding>
 
         <q-item clickable to="/data-cache-info">
-          <q-item-section>Data Cache (How It Works)</q-item-section>
+          <q-item-section>
+            Data Cache (How It Works)
+          </q-item-section>
         </q-item>
 
         <q-item clickable to="/data-cache-binder">
-          <q-item-section>Data Cache (Page Binder)</q-item-section>
+          <q-item-section>
+            Data Cache (Page Binder)
+          </q-item-section>
         </q-item>
 
         <q-item clickable to="/html-cache-pages">
-          <q-item-section>HTML Cache (Page List)</q-item-section>
+          <q-item-section>
+            HTML Cache (Page List)
+          </q-item-section>
         </q-item>
 
       </q-list>
@@ -29,9 +36,12 @@
     <q-page-container>
       <router-view />
     </q-page-container>
+
   </q-layout>
 </template>
 
-<script setup>
-// no logic needed yet
+<script>
+export default {
+  name: 'GlobalController'
+}
 </script>
