@@ -2,9 +2,9 @@
 
 ini_set('display_errors', false);
 
-require 'CurlClient.php';
-require 'OAuthClient.php';
-require 'helpers.php';
+require __DIR__ . '/CurlClient.php';
+require __DIR__ . '/OAuthClient.php';
+require __DIR__ . '/helpers.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
 

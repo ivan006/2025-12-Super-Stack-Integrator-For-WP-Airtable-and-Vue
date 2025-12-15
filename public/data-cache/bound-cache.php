@@ -10,7 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 header('Content-Type: application/json; charset=utf-8');
-require 'helpers.php';
+require __DIR__ . '/helpers.php';
 
 $dir = __DIR__ . '/cache';
 if (!file_exists($dir)) mkdir($dir, 0700, true);
