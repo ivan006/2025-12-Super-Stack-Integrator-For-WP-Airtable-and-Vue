@@ -36,3 +36,4 @@ yarn-error.log*
 # .env.production
 /public/data-cache/cache
 public/data-cache/config.json
+public/html-cache/pages.json
