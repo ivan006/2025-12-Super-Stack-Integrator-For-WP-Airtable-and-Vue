@@ -21,10 +21,17 @@
                     Configuration
                 </div>
 
-                <q-input v-model="apiUrl" label="Airtable API URL" outlined dense class="q-mb-md" />
+                <div class="row q-col-gutter-md q-mb-md">
+                    <div class="col-12 col-md-8">
+                        <q-input v-model="apiUrl" label="Airtable API URL" outlined dense />
+                    </div>
 
-                <q-input v-model="attachmentPath" label="Attachment Path (optional)" outlined dense
-                    placeholder="Attachments[0].thumbnails.large.url" class="q-mb-md" />
+                    <div class="col-12 col-md-4">
+                        <q-input v-model="attachmentPath" label="Attachment Path (optional)" outlined dense
+                            placeholder="Attachments[0].thumbnails.large.url" />
+                    </div>
+                </div>
+
 
                 <q-btn label="Start Compilation" color="primary" unelevated :loading="loading"
                     @click="startCompilation" />
@@ -287,36 +294,66 @@ export default {
             }
 
             this.loading = true
-            this.status = 'Starting compilation…'
+            this.status = 'Checking for existing bound cache…'
             this.pagesFetched = 0
             this.elapsedTime = '0s'
 
             try {
-                const start = Date.now()
+                const CACHE_BASE = import.meta.env.VITE_CACHE_BASE || ''
 
-                // 1️⃣ Fetch all pages (DATA)
-                const records = await this.fetchAllPages(this.apiUrl)
+                // 🔹 CHECK EXISTING BOUND CACHE (minimal)
+                const list = await fetch(
+                    `${CACHE_BASE}/data-cache/bound-cache.php?action=list`
+                ).then(r => r.json())
 
-                // 2️⃣ Touch attachments (IMAGES)
+                const hashBuffer = await crypto.subtle.digest(
+                    'SHA-256',
+                    new TextEncoder().encode(this.apiUrl)
+                )
+                const hashHex = [...new Uint8Array(hashBuffer)]
+                    .map(b => b.toString(16).padStart(2, '0'))
+                    .join('')
+                const filename = `bound-${hashHex}.json`
+
+                const existing = list.find(c => c.file === filename)
+
+                let records
+
+                if (existing) {
+                    // ✅ USE EXISTING CACHE
+                    this.status = 'Using existing bound cache…'
+                    const res = await fetch(
+                        `${CACHE_BASE}/data-cache/bound-cache.php?action=get&url=${encodeURIComponent(this.apiUrl)}`
+                    )
+                    const data = await res.json()
+                    records = data.records || []
+                    this.pagesFetched = records.length
+                } else {
+                    // 🔹 ORIGINAL FLOW (UNCHANGED)
+                    this.status = 'Starting compilation…'
+                    const start = Date.now()
+
+                    records = await this.fetchAllPages(this.apiUrl)
+
+                    const duration = ((Date.now() - start) / 1000).toFixed(2)
+
+                    await fetch(
+                        `${CACHE_BASE}/data-cache/bound-cache.php?action=save&url=${encodeURIComponent(this.apiUrl)}`,
+                        {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ records, duration })
+                        }
+                    )
+                }
+
+                // 🔹 ATTACHMENTS (UNCHANGED)
                 if (this.attachmentPath) {
                     this.status = 'Caching attachments…'
                     await this.touchAttachments(records, this.attachmentPath)
                 }
 
-                // 3️⃣ Save bound cache (JSON)
-                const duration = ((Date.now() - start) / 1000).toFixed(2)
-
-                const CACHE_BASE = import.meta.env.VITE_CACHE_BASE || ''
-                await fetch(
-                    `${CACHE_BASE}/data-cache/bound-cache.php?action=save&url=${encodeURIComponent(this.apiUrl)}`,
-                    {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ records, duration })
-                    }
-                )
-
-                this.status = `✅ Compilation complete (${records.length} records)`
+                this.status = `✅ Done (${records.length} records)`
                 this.listCaches()
 
             } catch (e) {
