@@ -39,39 +39,8 @@
             </q-card-section>
         </q-card>
 
-        <!-- Compilation Status -->
-        <q-card flat bordered class="q-mb-md">
-            <q-card-section>
-
-                <div class="text-subtitle1 q-mb-md">
-                    Compilation Status
-                </div>
-
-                <div class="text-body2">
-                    Pages fetched:
-                    <strong>{{ pagesFetched }}</strong>
-                </div>
-
-                <div class="text-body2">
-                    Attachments cached:
-                    <strong>—</strong>
-                </div>
-
-                <div class="text-body2">
-                    Elapsed time:
-                    <strong>{{ elapsedTime }}</strong>
-                </div>
-
-                <div v-if="status" class="text-body2 q-mt-sm">
-                    {{ status }}
-                </div>
-
-            </q-card-section>
-        </q-card>
-
-
         <!-- Existing Bound Caches -->
-        <q-card flat bordered>
+        <q-card flat bordered class="q-mb-md">
             <q-card-section>
 
                 <div class="text-subtitle1 q-mb-md">
@@ -91,21 +60,61 @@
 
             </q-card-section>
         </q-card>
+        <div class="row q-col-gutter-md q-mb-md">
+
+
+            <div class="col-12 col-md-6">
+
+
+                <!-- Compilation Status -->
+                <q-card flat bordered class="q-mb-md">
+                    <q-card-section>
+                        <div class="text-subtitle1 q-mb-md">
+                            Compilation Status
+                        </div>
+
+                        <div class="row q-col-gutter-md items-center text-body2">
+                            <div class="col-auto">
+                                Pages fetched: <strong>{{ pagesFetched }}</strong>
+                            </div>
+
+                            <div class="col-auto">
+                                Attachments cached: <strong>—</strong>
+                            </div>
+
+                            <div class="col-auto">
+                                Elapsed time: <strong>{{ elapsedTime }}</strong>
+                            </div>
 
 
 
-        <!-- Attachment Progress -->
-        <q-card flat bordered class="q-mb-md">
-            <q-card-section>
-                <div class="text-subtitle1 q-mb-sm">Attachment Progress</div>
+                            <div v-if="status" class="col-auto">
+                                {{ status }}
+                            </div>
+                        </div>
+                    </q-card-section>
 
-                <q-linear-progress :value="attachmentProgress" color="green" stripe class="q-mb-sm" />
+                </q-card>
 
-                <div class="text-caption">
-                    {{ attachmentLoaded }} / {{ attachmentTotal }} attachments
-                </div>
-            </q-card-section>
-        </q-card>
+            </div>
+            <div class="col-12 col-md-6">
+
+                <!-- Attachment Progress -->
+                <q-card flat bordered class="q-mb-md">
+                    <q-card-section>
+                        <div class="text-subtitle1 q-mb-sm">Attachment Progress</div>
+
+                        <q-linear-progress :value="attachmentProgress" color="green" stripe class="q-mb-sm" />
+
+                        <div class="text-caption">
+                            {{ attachmentLoaded }} / {{ attachmentTotal }} attachments
+                        </div>
+                    </q-card-section>
+                </q-card>
+            </div>
+        </div>
+
+
 
         <!-- Attachment Grid -->
         <q-card flat bordered v-if="attachmentImages.length">
