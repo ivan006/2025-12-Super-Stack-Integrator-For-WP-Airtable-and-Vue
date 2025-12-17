@@ -1,53 +1,58 @@
 <template>
-    <div style="max-height: 420px; overflow-y: auto">
+    <div>
 
-        <!-- EACH SITEMAP SECTION -->
-        <div v-for="section in sections" :key="section.key" class="q-mb-md">
+        <!-- SUB TABS (only if multiple sitemaps) -->
+        <q-tabs v-if="sections.length > 1" v-model="activeTab" dense class="q-mb-sm">
+            <q-tab v-for="s in sections" :key="s.key" :name="s.key" :label="s.label" />
+        </q-tabs>
 
+        <q-separator v-if="sections.length > 1" />
 
-            <!-- Section Header -->
-            <q-item class="bg-grey-3">
-                <q-item-section>
-                    <strong>{{ section.label }}</strong>
-                </q-item-section>
-            </q-item>
+        <!-- TAB PANELS -->
+        <q-tab-panels v-model="activeTab" animated>
 
-            <!-- Select All (per sitemap) -->
-            <q-item clickable @click="toggleAll(section)">
-                <q-item-section>
-                    <strong>
-                        {{ allSelected(section) ? 'Unselect all' : 'Select all' }}
-                    </strong>
-                </q-item-section>
-            </q-item>
+            <q-tab-panel v-for="section in sections" :key="section.key" :name="section.key">
+                <div style="max-height: 420px; overflow-y: auto">
 
-            <q-separator />
+                    <!-- Select All -->
+                    <q-item clickable @click="toggleAll(section)">
+                        <q-item-section>
+                            <strong>
+                                {{ allSelected(section) ? 'Unselect all' : 'Select all' }}
+                            </strong>
+                        </q-item-section>
+                    </q-item>
 
-            <!-- Groups of 10 -->
-            <div v-for="(group, gIdx) in grouped(section.items)" :key="gIdx">
-                <q-item clickable class="bg-grey-2" @click="toggleGroup(section, group)">
-                    <q-item-section>
-                        <strong>
-                            Group {{ gIdx + 1 }}
-                            ({{ groupSelectedCount(group) }}/{{ group.length }})
-                        </strong>
-                    </q-item-section>
-                </q-item>
+                    <q-separator />
 
-                <q-item v-for="item in group" :key="item.value" clickable @click="toggle(item.value)">
-                    <q-item-section>
-                        {{ item.label }}
-                    </q-item-section>
-                    <q-item-section side>
-                        <q-checkbox :model-value="modelValue.includes(item.value)"
-                            @update:model-value="toggle(item.value)" />
-                    </q-item-section>
-                </q-item>
+                    <!-- Groups of 10 -->
+                    <div v-for="(group, gIdx) in grouped(section.items)" :key="gIdx">
+                        <q-item clickable class="bg-grey-2" @click="toggleGroup(section, group)">
+                            <q-item-section>
+                                <strong>
+                                    Group {{ gIdx + 1 }}
+                                    ({{ groupSelectedCount(group) }}/{{ group.length }})
+                                </strong>
+                            </q-item-section>
+                        </q-item>
 
-                <q-separator />
-            </div>
+                        <q-item v-for="item in group" :key="item.value" clickable @click="toggle(item.value)">
+                            <q-item-section>
+                                {{ item.label }}
+                            </q-item-section>
+                            <q-item-section side>
+                                <q-checkbox :model-value="modelValue.includes(item.value)"
+                                    @update:model-value="toggle(item.value)" />
+                            </q-item-section>
+                        </q-item>
 
-        </div>
+                        <q-separator />
+                    </div>
+
+                </div>
+            </q-tab-panel>
+
+        </q-tab-panels>
 
     </div>
 </template>
@@ -77,7 +82,8 @@ export default {
 
     data() {
         return {
-            sections: []
+            sections: [],
+            activeTab: null
         }
     },
 
@@ -91,6 +97,8 @@ export default {
                 items: this.options
             }]
         }
+
+        this.activeTab = this.sections[0]?.key
     },
 
     methods: {
@@ -119,12 +127,11 @@ export default {
 
         toggleAll(section) {
             const set = new Set(this.modelValue)
+            const all = this.allSelected(section)
 
-            if (this.allSelected(section)) {
-                section.items.forEach(i => set.delete(i.value))
-            } else {
-                section.items.forEach(i => set.add(i.value))
-            }
+            section.items.forEach(i =>
+                all ? set.delete(i.value) : set.add(i.value)
+            )
 
             this.emit([...set])
         },
@@ -148,17 +155,17 @@ export default {
             const xml = await fetch(url).then(r => r.text())
             const doc = new DOMParser().parseFromString(xml, 'text/xml')
 
-            const sitemapNodes = [...doc.querySelectorAll('sitemap > loc')]
+            const indexNodes = [...doc.querySelectorAll('sitemap > loc')]
 
-            // SITEMAP INDEX → MULTIPLE SECTIONS
-            if (sitemapNodes.length) {
-                for (const n of sitemapNodes) {
+            // SITEMAP INDEX → MULTIPLE TABS
+            if (indexNodes.length) {
+                for (const n of indexNodes) {
                     await this.loadSitemap(n.textContent)
                 }
                 return
             }
 
-            // NORMAL URLSET
+            // NORMAL URLSET → SINGLE TAB
             const urls = [...doc.querySelectorAll('url > loc')]
 
             const items = urls.map((n, i) => {
