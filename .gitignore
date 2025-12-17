@@ -37,4 +37,3 @@ yarn-error.log*
 /public/data-cache/cache
 public/data-cache/config.json
 public/html-cache/pages.json
-public/html-cache/sitemaps.json
