@@ -1,6 +1,7 @@
 <template>
     <q-page class="q-pa-md">
 
+        <!-- Title -->
         <div class="text-h5 q-mb-sm">
             HTML Cache — Static Page Freezer
         </div>
@@ -18,16 +19,31 @@
             </q-card-section>
         </q-card>
 
-        <!-- Pages -->
+        <!-- SOURCE TABS -->
         <q-card flat bordered class="q-mb-md">
             <q-card-section>
-                <div class="text-subtitle1 q-mb-sm">Pages</div>
 
-                <q-option-group v-model="selected" type="checkbox" :options="pageOptions" dense />
+                <q-tabs v-model="activeTab" dense class="text-grey" active-color="primary" indicator-color="primary">
+                    <q-tab name="pages" label="Pages.json" />
+                    <q-tab v-for="(s, i) in sitemaps" :key="i" :name="`sitemap-${i}`" :label="s.title" />
+                </q-tabs>
 
-                <div class="text-caption text-grey q-mt-sm">
-                    Homepage is always available. Other pages are loaded from <code>pages.json</code>.
+                <q-separator class="q-my-md" />
+
+                <!-- Pages.json -->
+                <div v-if="activeTab === 'pages'">
+                    <q-option-group v-model="selected" type="checkbox" :options="pageOptions" dense />
+
+                    <div class="text-caption text-grey q-mt-sm">
+                        Homepage is always available. Other pages come from <code>pages.json</code>.
+                    </div>
                 </div>
+
+                <!-- Sitemap Tabs -->
+                <div v-for="(s, i) in sitemaps" :key="i" v-show="activeTab === `sitemap-${i}`">
+                    <SitemapSelector :sitemap-url="s.url" @update:selected="selected = $event" />
+                </div>
+
             </q-card-section>
         </q-card>
 
@@ -68,23 +84,30 @@
 </template>
 
 <script>
+import SitemapSelector from './SitemapSelector.vue'
+
 export default {
     name: 'HtmlCachePages',
 
+    components: {
+        SitemapSelector
+    },
+
     data() {
         return {
-            pageOptions: [
-                { label: 'Homepage', value: '' }
-            ],
+            activeTab: 'pages',
+            pageOptions: [{ label: 'Homepage', value: '' }],
             selected: [],
             loading: false,
             status: '',
-            currentUrl: ''
+            currentUrl: '',
+            sitemaps: []
         }
     },
 
     mounted() {
         this.loadPages()
+        this.loadSitemaps()
     },
 
     methods: {
@@ -109,6 +132,20 @@ export default {
             }
         },
 
+        async loadSitemaps() {
+            try {
+                const res = await fetch(`${this.cacheBase()}/html-cache/sitemaps.json`)
+                const data = await res.json()
+
+                this.sitemaps = (data.sitemaps || []).map(url => ({
+                    url,
+                    title: url.split('/').pop()
+                }))
+            } catch {
+                // sitemap support is optional
+            }
+        },
+
         async post(payload) {
             const body = new URLSearchParams(payload)
             return fetch(`${this.cacheBase()}/html-cache/index.php`, {
@@ -126,11 +163,12 @@ export default {
 
         async deletePages() {
             if (!this.selected.length) return
-
             this.loading = true
+
             for (const slug of this.selected) {
                 this.status = await this.post({ action: 'delete', slug })
             }
+
             this.loading = false
         },
 
@@ -142,7 +180,9 @@ export default {
             const base = window.location.origin
 
             for (const slug of this.selected) {
-                const url = slug ? `${base}/${slug}/` : `${base}/`
+                const path = slug.replace(/^\/|\/$/g, '')
+                const url = path ? `${base}/${path}/` : `${base}/`
+
                 this.currentUrl = url
                 iframe.src = url
 
@@ -152,9 +192,10 @@ export default {
                             try {
                                 const html = iframe.contentDocument.documentElement.outerHTML
                                 const encoded = btoa(unescape(encodeURIComponent(html)))
+
                                 this.status = await this.post({
                                     action: 'save',
-                                    slug,
+                                    slug: path,
                                     html: encoded
                                 })
                             } catch {
