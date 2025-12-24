@@ -92,31 +92,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             mkdir($folder, 0755, true);
         }
 
-        // Remove JSON-LD
-        $html = preg_replace(
-            '/<script[^>]+type=["\']application\/ld\+json["\'][^>]*>.*?<\/script>/is',
-            '',
-            $html
-        );
+        // // Remove JSON-LD
+        // $html = preg_replace(
+        //     '/<script[^>]+type=["\']application\/ld\+json["\'][^>]*>.*?<\/script>/is',
+        //     '',
+        //     $html
+        // );
 
-        // Remove canonical links
-        $html = preg_replace(
-            '/<link[^>]+rel=["\']canonical["\'][^>]*>/i',
-            '',
-            $html
-        );
+        // // Remove canonical links
+        // $html = preg_replace(
+        //     '/<link[^>]+rel=["\']canonical["\'][^>]*>/i',
+        //     '',
+        //     $html
+        // );
 
-        // Remove meta SEO / social tags
-        $html = preg_replace(
-            '/<meta[^>]+name=["\'](description|twitter:[^"\']+)["\'][^>]*>/i',
-            '',
-            $html
-        );
-        $html = preg_replace(
-            '/<meta[^>]+property=["\']og:[^"\']+["\'][^>]*>/i',
-            '',
-            $html
-        );
+        // // Remove meta SEO / social tags
+        // $html = preg_replace(
+        //     '/<meta[^>]+name=["\'](description|twitter:[^"\']+)["\'][^>]*>/i',
+        //     '',
+        //     $html
+        // );
+        // $html = preg_replace(
+        //     '/<meta[^>]+property=["\']og:[^"\']+["\'][^>]*>/i',
+        //     '',
+        //     $html
+        // );
 
         // Remove Google Tag Manager
         $html = preg_replace(
