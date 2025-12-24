@@ -4,6 +4,11 @@
     Header set Access-Control-Allow-Methods "GET, OPTIONS"
     Header set Access-Control-Allow-Headers "*"
   </Files>
+  <Files "sitemaps.json">
+    Header set Access-Control-Allow-Origin "*"
+    Header set Access-Control-Allow-Methods "GET, OPTIONS"
+    Header set Access-Control-Allow-Headers "*"
+  </Files>
 </IfModule>
 
 <IfModule mod_rewrite.c>
