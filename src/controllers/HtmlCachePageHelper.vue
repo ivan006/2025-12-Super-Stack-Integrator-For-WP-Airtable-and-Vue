@@ -25,7 +25,7 @@
 
                     <q-separator />
 
-                    <!-- Groups of 10 -->
+                    <!-- Groups of 100 -->
                     <div v-for="(group, gIdx) in grouped(section.items)" :key="gIdx">
                         <q-item clickable class="bg-grey-2" @click="toggleGroup(section, group)">
                             <q-item-section>
@@ -114,8 +114,8 @@ export default {
 
         grouped(items) {
             const groups = []
-            for (let i = 0; i < items.length; i += 10) {
-                groups.push(items.slice(i, i + 10))
+            for (let i = 0; i < items.length; i += 100) {
+                groups.push(items.slice(i, i + 100))
             }
             return groups
         },

@@ -58,16 +58,30 @@
             <q-card-section>
                 <div class="text-subtitle1 q-mb-sm">Status</div>
 
-                <div class="text-body2">
-                    Target URL:
-                    <strong>{{ currentUrl || '—' }}</strong>
+                <div class="row q-col-gutter-md">
+                <!-- Batch status (LEFT) -->
+                <div class="col-4">
+                    <div class="text-caption text-grey-6">Batch</div>
+                    <div class="text-body2">{{ batchStatus || 'Idle' }}</div>
+                    <div class="text-caption text-grey-7 q-mt-xs">
+                    Time: {{ batchDuration }}
+                    </div>
                 </div>
 
-                <div class="text-body2 q-mt-sm" v-if="status">
+                <!-- Item status (RIGHT) -->
+                <div class="col-8">
+                    <div class="text-caption text-grey-6">Current Item</div>
+                    <div class="text-body2">
+                    URL: <strong>{{ currentUrl || '—' }}</strong>
+                    </div>
+                    <div class="text-body2 q-mt-xs" v-if="status">
                     {{ status }}
+                    </div>
+                </div>
                 </div>
             </q-card-section>
         </q-card>
+
 
         <!-- Preview -->
         <q-card flat bordered>
@@ -97,7 +111,11 @@ export default {
             selected: [],
             loading: false,
             status: '',
-            currentUrl: ''
+            currentUrl: '',
+            
+            batchStatus: '',
+            batchStart: null,
+            batchDuration: '—',
         }
     },
 
@@ -154,6 +172,9 @@ export default {
         },
 
         async deletePages() {
+            this.batchStart = Date.now()
+            this.batchStatus = 'Running'
+
             if (!this.selected.length) return
             this.loading = true
 
@@ -162,13 +183,20 @@ export default {
                     action: 'delete',
                     slug
                 })
+                const seconds = Math.round((Date.now() - this.batchStart) / 1000)
+                this.batchDuration = `${seconds}s`
+
             }
 
+            this.batchStatus = 'Completed'
             this.loading = false
         },
 
         async cachePages() {
             if (!this.selected.length) return
+
+            this.batchStart = Date.now()
+            this.batchStatus = 'Running'
 
             this.loading = true
             const iframe = this.$refs.iframe
@@ -197,7 +225,11 @@ export default {
                         }, 1000)
                     }
                 })
+                const seconds = Math.round((Date.now() - this.batchStart) / 1000)
+                this.batchDuration = `${seconds}s`
             }
+
+            this.batchStatus = 'Completed'
 
             this.loading = false
         }

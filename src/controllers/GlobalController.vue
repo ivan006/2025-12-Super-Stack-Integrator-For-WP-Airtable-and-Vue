@@ -7,10 +7,12 @@
         <q-toolbar-title>
           Cache Manager
         </q-toolbar-title>
+        <q-btn flat @click="drawerLeft = !drawerLeft" round dense icon="menu" />
       </q-toolbar>
     </q-header>
 
-    <q-drawer show-if-above bordered>
+    <q-drawer show-if-above bordered 
+        v-model="drawerLeft">
       <q-list padding>
 
         <q-item clickable to="/data-cache-info">
@@ -46,6 +48,11 @@
 
 <script>
 export default {
-  name: 'GlobalController'
+  name: 'GlobalController',
+  data(){
+    return {
+      drawerLeft: false
+    }
+  }
 }
 </script>
