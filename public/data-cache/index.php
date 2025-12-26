@@ -203,6 +203,23 @@ if ($info['http_code'] >= 400) {
   exit();
 }
 
+// ✅ Strong browser caching
+header('Cache-Control: public, max-age=86400, immutable');
+
+// ✅ Revalidation support
+if (!empty($info['headers']['etag'])) {
+  header('ETag: ' . $info['headers']['etag']);
+} else {
+  header('ETag: "' . md5_file($file) . '"');
+}
+
+if (!empty($info['headers']['last-modified'])) {
+  header('Last-Modified: ' . $info['headers']['last-modified']);
+} else {
+  header('Last-Modified: ' . gmdate('D, d M Y H:i:s', filemtime($file)) . ' GMT');
+}
+
+
 //if ($method === 'GET' || $method === 'POST') {
   readfile('compress.zlib://' . $file);
 //}
