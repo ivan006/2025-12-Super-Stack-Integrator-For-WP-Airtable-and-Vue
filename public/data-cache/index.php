@@ -49,6 +49,11 @@ if (isset($_GET['regenerate'])) {
 
 
 if (isset($_GET['delete'])) {
+  
+  header('Access-Control-Allow-Origin: *');
+  header('Access-Control-Allow-Methods: GET, OPTIONS');
+  header('Access-Control-Allow-Headers: *');
+
   $url = $_GET['delete'];
   $method = 'GET'; // or loop through all methods if needed
   $file = buildFilePath($method, $url);
