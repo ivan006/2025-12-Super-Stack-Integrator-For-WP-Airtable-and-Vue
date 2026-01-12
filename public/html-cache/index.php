@@ -131,11 +131,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $html
         );
 
+        // $html = preg_replace(
+        //     '/<script[^>]*>\s*\(function\s*\([\s\S]*?googletagmanager\.com\/gtm\.js[\s\S]*?\);\s*<\/script>/i',
+        //     '',
+        //     $html
+        // );
+
+
+
+        // $html = preg_replace(
+        //     '/<script>\s*window\.Userback\s*=.*?static\.userback\.io\/widget\/v1\.js.*?\<\/script>/is',
+        //     '',
+        //     $html
+        // );
+
         $html = preg_replace(
-            '/<script>\s*\(function\(w,d,s,l,i\)\{.*?googletagmanager\.com\/gtm\.js.*?\}\)\(window,document,.*?\);\s*<\/script>/is',
+            '/<script[^>]+src=["\']https:\/\/static\.userback\.io\/widget\/v1\.js[^"\']*["\'][^>]*>\s*<\/script>/i',
             '',
             $html
         );
+
+        $html = preg_replace(
+            '/<ubdiv[^>]*id="userback_button_container"[\s\S]*?<\/ubdiv>/i',
+            '',
+            $html
+        );
+
+
 
 
 
