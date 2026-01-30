@@ -1,0 +1,4 @@
+# Block all JSON config files
+<FilesMatch "\.json$">
+  Require all denied
+</FilesMatch>

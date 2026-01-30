@@ -1,4 +1,14 @@
-# 🧊 2025-12-Airtable-Data-and-Vue-Html-Cacher
+#  Superstack Integrators - For Wordpress, Airtable and Vue
+
+## Overview
+
+This repository implements a super-stack integration strategy for WordPress, Airtable, and Vue.
+
+The core philosophy is spiritual integration over physical integration: instead of building monolithic systems or duplicating existing services, we compose proven platforms through explicit integration layers.
+
+This approach prioritises rapid development, lower cost, and experimentation. By piggybacking on mature tools and integrating them cleanly, small teams can validate ideas faster without committing to heavy infrastructure upfront.
+
+## 🧊 Data and Page
 
 A **Vue-based caching service** for websites built with **Vue + Airtable**, designed to improve **performance, SEO, and stability** by caching both **API data** and **fully rendered HTML pages**.
 
@@ -6,7 +16,7 @@ This project is **not the website itself** — it is a **cache management servic
 
 ---
 
-## 🧠 Architecture Overview
+### 🧠 Architecture Overview
 
 ```
 /webroot
@@ -27,15 +37,15 @@ This allows the service to:
 
 ---
 
-## 🔹 What This Service Does
+### 🔹 What This Service Does
 
 The system manages **five cache strategies**, split across **data caching** and **HTML caching**.
 
 ---
 
-## 📦 DATA CACHING
+### 📦 DATA CACHING
 
-### 1️⃣ Data – Simple Data Cache
+#### 1️⃣ Data – Simple Data Cache
 
 A **generic HTTP proxy cache** used primarily for Airtable API calls.
 
@@ -56,7 +66,7 @@ A **generic HTTP proxy cache** used primarily for Airtable API calls.
 
 ---
 
-### 2️⃣ Data – Page Binder Cache
+#### 2️⃣ Data – Page Binder Cache
 
 A **dataset compiler** for Airtable.
 
@@ -75,7 +85,7 @@ A **dataset compiler** for Airtable.
 
 ---
 
-## 🧊 HTML CACHING (STATIC FREEZING)
+### 🧊 HTML CACHING (STATIC FREEZING)
 
 All HTML caching is done by:
 
@@ -85,7 +95,7 @@ All HTML caching is done by:
 
 ---
 
-### 3️⃣ HTML – Cache from URL
+#### 3️⃣ HTML – Cache from URL
 
 * Cache a single Vue route
 * Saves rendered HTML to disk
@@ -103,7 +113,7 @@ All HTML caching is done by:
 
 ---
 
-### 4️⃣ HTML – Cache from List
+#### 4️⃣ HTML – Cache from List
 
 * Uses a predefined `pages.json`
 * Allows multi-select
@@ -117,7 +127,7 @@ All HTML caching is done by:
 
 ---
 
-### 5️⃣ HTML – Cache from Sitemap
+#### 5️⃣ HTML – Cache from Sitemap
 
 * Reads sitemap URLs from `sitemaps.json`
 * Supports:
@@ -140,9 +150,9 @@ All HTML caching is done by:
 
 ---
 
-## ⚙️ Configuration Files
+### ⚙️ Configuration Files
 
-### `pages.json`
+#### `pages.json`
 
 ```json
 [
@@ -153,7 +163,7 @@ All HTML caching is done by:
 
 ---
 
-### `sitemaps.json`
+#### `sitemaps.json`
 
 ```json
 {
@@ -167,7 +177,7 @@ All HTML caching is done by:
 
 ---
 
-## 🧩 UI Stack
+### 🧩 UI Stack
 
 * Vue (Options API)
 * Quasar UI components
@@ -182,7 +192,7 @@ Main UI components:
 
 ---
 
-## 🔐 Assumptions & Constraints
+### 🔐 Assumptions & Constraints
 
 * Full control of the target website
 * Same-origin required (iframes + file writes)
@@ -191,7 +201,7 @@ Main UI components:
 
 ---
 
-## ❌ What This Is NOT
+### ❌ What This Is NOT
 
 * Not SSR
 * Not a CDN
@@ -202,8 +212,44 @@ This is a **pragmatic, site-owned caching layer**.
 
 ---
 
-## 🎯 Why This Exists
+### 🎯 Why This Exists
 
 * Vue SPAs are fast — but invisible to crawlers
 * Airtable is flexible — but rate-limited
 * This service bridges the gap **without changing your app architecture**
+
+
+
+
+## Data Acceptance (IRIS — Ivan’s Robust Integration System)
+
+### Philosophy
+
+**IRIS is a relationship-first integration system.**
+
+Most integrations sync records.
+Very few sync **relationships** — even though relationships are a **critical** part of any real integration.
+
+IRIS exists to treat relationships as first-class concerns.
+
+---
+
+#### What IRIS Does
+
+**Relationship Syncing (Primary)**
+IRIS syncs relationships by assigning entities a stable internal identity and translating foreign keys between systems at sync time, rather than leaking IDs across schemas.
+This allows each system to use its own native identifiers while relationships remain correct.
+
+**Revision Tracking (Secondary)**
+Because entities have stable identity, IRIS can diff changes, commit them, and maintain a revision history.
+This capability naturally emerges from the same foundation used for relationship syncing.
+
+**Intervention Mode (Optional)**
+IRIS can require **moderator approval** before changes are committed, enabling controlled, review-based integrations.
+
+---
+
+#### Notes
+
+* IRIS also supports **image and media syncing** (adapter-specific where necessary)
+* The system is **target- and source-agnostic**, where practical

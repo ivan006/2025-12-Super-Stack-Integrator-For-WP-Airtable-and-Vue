@@ -33,6 +33,12 @@
           </q-item-section>
         </q-item>
 
+        <q-item clickable to="/data-acceptance">
+          <q-item-section>
+            Data Acceptance
+          </q-item-section>
+        </q-item>
+
       </q-list>
     </q-drawer>
 

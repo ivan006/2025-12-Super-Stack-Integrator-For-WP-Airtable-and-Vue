@@ -22,6 +22,11 @@ const routes = [
         path: 'html-cache-pages',
         component: () => import('src/controllers/HtmlCachePages.vue'),
         meta: { requiresAuth: false }
+      },
+      {
+        path: 'data-acceptance',
+        component: () => import('src/controllers/HomeComponent.vue'),
+        meta: { requiresAuth: false }
       }
     ]
   },

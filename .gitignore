@@ -38,3 +38,6 @@ yarn-error.log*
 public/data-cache/config.json
 public/html-cache/pages.json
 public/html-cache/sitemaps.json
+
+public/data-acceptance/config.json
+public/data-acceptance/env.json
