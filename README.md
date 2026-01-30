@@ -26,11 +26,11 @@ This project is **not the website itself** — it is a **cache management servic
 ```
 /webroot
   /            → Target website (Vue + Airtable)
-  /cacher      → This caching service (Vue UI + PHP cache engine)
+  /integrator      → This caching service (Vue UI + PHP cache engine)
 ```
 
 * The **target website** lives at the webroot (`/`)
-* The **caching service** lives in `/cacher`
+* The **caching service** lives in `/integrator`
 * The cacher **reads and writes files into the parent directory**
 * Same-origin is assumed (full control of the site)
 
@@ -202,7 +202,7 @@ Main UI components:
 * Full control of the target website
 * Same-origin required (iframes + file writes)
 * HTML caching tested on staging/production (not local)
-* Apache/Nginx configured to allow PHP execution in `/cacher`
+* Apache/Nginx configured to allow PHP execution in `/integrator`
 
 ---
 
