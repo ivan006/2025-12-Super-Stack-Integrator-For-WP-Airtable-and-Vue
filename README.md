@@ -8,6 +8,11 @@ The core philosophy is spiritual integration over physical integration: instead 
 
 This approach prioritises rapid development, lower cost, and experimentation. By piggybacking on mature tools and integrating them cleanly, small teams can validate ideas faster without committing to heavy infrastructure upfront.
 
+## Rough Layout
+
+portal -> data acceptance -> cms -> data caching -> site -> html caching -> seo
+
+
 ## 🧊 Data and Page
 
 A **Vue-based caching service** for websites built with **Vue + Airtable**, designed to improve **performance, SEO, and stability** by caching both **API data** and **fully rendered HTML pages**.
