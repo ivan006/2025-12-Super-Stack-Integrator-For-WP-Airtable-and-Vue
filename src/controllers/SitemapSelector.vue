@@ -1,6 +1,5 @@
 <template>
   <div>
-
     <!-- Sub-sitemap tabs (only if index) -->
     <q-tabs
       v-if="isIndex"
@@ -33,15 +32,10 @@
     />
 
     <!-- Groups -->
-    <div
-      v-for="group in groups"
-      :key="group.index"
-      class="q-mb-md"
-    >
+    <div v-for="group in groups" :key="group.index" class="q-mb-md">
       <div class="row items-center q-mb-xs">
         <div class="text-caption">
-          Group {{ group.index + 1 }}
-          ({{ group.start }}–{{ group.end }})
+          Group {{ group.index + 1 }} ({{ group.start }}–{{ group.end }})
         </div>
 
         <q-space />
@@ -58,155 +52,153 @@
         v-model="localSelected"
         type="checkbox"
         dense
-        :options="group.items.map((p, i) => ({
-          label: `${group.start + i}. ${p}`,
-          value: p
-        }))"
+        :options="
+          group.items.map((p, i) => ({
+            label: `${group.start + i}. ${p}`,
+            value: p,
+          }))
+        "
       />
     </div>
 
-    <div v-if="loading" class="text-caption text-grey">
-      Loading sitemap…
-    </div>
-
+    <div v-if="loading" class="text-caption text-grey">Loading sitemap…</div>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'SitemapSelector',
+  name: "SitemapSelector",
 
   props: {
-    sitemapUrl: { type: String, required: true }
+    sitemapUrl: { type: String, required: true },
   },
 
-  emits: ['update:selected'],
+  emits: ["update:selected"],
 
-  data () {
+  data() {
     return {
       isIndex: false,
       subSitemaps: [],
       activeSub: 0,
       paths: [],
       localSelected: [],
-      loading: false
-    }
+      loading: false,
+    };
   },
 
   computed: {
-    title () {
-      return this.sitemapUrl.split('/').pop()
+    title() {
+      return this.sitemapUrl.split("/").pop();
     },
 
-    allSelected () {
-      return this.paths.length &&
-        this.localSelected.length === this.paths.length
+    allSelected() {
+      return (
+        this.paths.length && this.localSelected.length === this.paths.length
+      );
     },
 
-    groups () {
-      const size = 10
-      const out = []
+    groups() {
+      const size = 10;
+      const out = [];
       for (let i = 0; i < this.paths.length; i += size) {
         out.push({
           index: out.length,
           start: i + 1,
           end: i + Math.min(size, this.paths.length - i),
-          items: this.paths.slice(i, i + size)
-        })
+          items: this.paths.slice(i, i + size),
+        });
       }
-      return out
-    }
+      return out;
+    },
   },
 
   watch: {
-    localSelected () {
-      this.$emit('update:selected', this.localSelected)
+    localSelected() {
+      this.$emit("update:selected", this.localSelected);
     },
 
-    activeSub () {
+    activeSub() {
       if (this.isIndex) {
-        this.loadSubSitemap(this.activeSub)
+        this.loadSubSitemap(this.activeSub);
       }
-    }
+    },
   },
 
-  mounted () {
-    this.loadRoot()
+  mounted() {
+    this.loadRoot();
   },
 
   methods: {
-    normalize (url) {
+    normalize(url) {
       try {
-        const p = new URL(url).pathname
-        return p.endsWith('/') ? p : p + '/'
+        const p = new URL(url).pathname;
+        return p.endsWith("/") ? p : p + "/";
       } catch {
-        return null
+        return null;
       }
     },
 
-    async loadRoot () {
-      this.loading = true
+    async loadRoot() {
+      this.loading = true;
 
-      const res = await fetch(this.sitemapUrl)
-      const xml = await res.text()
-      const doc = new DOMParser().parseFromString(xml, 'text/xml')
+      const res = await fetch(this.sitemapUrl);
+      const xml = await res.text();
+      const doc = new DOMParser().parseFromString(xml, "text/xml");
 
-      const indexNodes = [...doc.querySelectorAll('sitemap > loc')]
+      const indexNodes = [...doc.querySelectorAll("sitemap > loc")];
 
       if (indexNodes.length) {
-        this.isIndex = true
-        this.subSitemaps = indexNodes.map(loc => ({
+        this.isIndex = true;
+        this.subSitemaps = indexNodes.map((loc) => ({
           url: loc.textContent,
-          title: loc.textContent.split('/').pop(),
+          title: loc.textContent.split("/").pop(),
           loaded: false,
-          paths: []
-        }))
-        await this.loadSubSitemap(0)
+          paths: [],
+        }));
+        await this.loadSubSitemap(0);
       } else {
-        this.paths = this.extractPaths(doc)
+        this.paths = this.extractPaths(doc);
       }
 
-      this.loading = false
+      this.loading = false;
     },
 
-    extractPaths (doc) {
-      return [...doc.querySelectorAll('url > loc')]
-        .map(n => this.normalize(n.textContent))
-        .filter(Boolean)
+    extractPaths(doc) {
+      return [...doc.querySelectorAll("url > loc")]
+        .map((n) => this.normalize(n.textContent))
+        .filter(Boolean);
     },
 
-    async loadSubSitemap (index) {
-      const s = this.subSitemaps[index]
+    async loadSubSitemap(index) {
+      const s = this.subSitemaps[index];
       if (s.loaded) {
-        this.paths = s.paths
-        return
+        this.paths = s.paths;
+        return;
       }
 
-      this.loading = true
-      const res = await fetch(s.url)
-      const xml = await res.text()
-      const doc = new DOMParser().parseFromString(xml, 'text/xml')
+      this.loading = true;
+      const res = await fetch(s.url);
+      const xml = await res.text();
+      const doc = new DOMParser().parseFromString(xml, "text/xml");
 
-      s.paths = this.extractPaths(doc)
-      s.loaded = true
-      this.paths = s.paths
+      s.paths = this.extractPaths(doc);
+      s.loaded = true;
+      this.paths = s.paths;
 
-      this.loading = false
+      this.loading = false;
     },
 
-    toggleAll () {
-      this.localSelected = this.allSelected ? [] : [...this.paths]
+    toggleAll() {
+      this.localSelected = this.allSelected ? [] : [...this.paths];
     },
 
-    toggleGroup (group) {
-      const allIn = group.items.every(p =>
-        this.localSelected.includes(p)
-      )
+    toggleGroup(group) {
+      const allIn = group.items.every((p) => this.localSelected.includes(p));
 
       this.localSelected = allIn
-        ? this.localSelected.filter(p => !group.items.includes(p))
-        : Array.from(new Set([...this.localSelected, ...group.items]))
-    }
-  }
-}
+        ? this.localSelected.filter((p) => !group.items.includes(p))
+        : Array.from(new Set([...this.localSelected, ...group.items]));
+    },
+  },
+};
 </script>

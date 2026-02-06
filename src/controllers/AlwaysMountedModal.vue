@@ -1,6 +1,5 @@
 <template>
   <div>
-
     <!-- BACKDROP (click closes) -->
     <div
       v-show="modelValue"
@@ -10,10 +9,10 @@
         left: 0;
         width: 100vw;
         height: 100vh;
-        background: rgba(0,0,0,0.45);
+        background: rgba(0, 0, 0, 0.45);
         z-index: 2000;
       "
-      @click="close" 
+      @click="close"
     ></div>
 
     <!-- MODAL WRAPPER (does NOT block backdrop) -->
@@ -25,7 +24,7 @@
         left: 0;
         width: 100vw;
         height: 100vh;
-        pointer-events: none;  
+        pointer-events: none;
         z-index: 2001;
       "
     >
@@ -39,14 +38,13 @@
           max-width: 95vw;
           max-height: 90vh;
           overflow: hidden;
-          pointer-events: auto; 
+          pointer-events: auto;
         "
         @click.stop
       >
         <slot />
       </q-card>
     </div>
-
   </div>
 </template>
 
@@ -54,14 +52,14 @@
 export default {
   name: "AlwaysMountedModal",
   props: {
-    modelValue: { type: Boolean, required: true }
+    modelValue: { type: Boolean, required: true },
   },
   emits: ["update:modelValue"],
   methods: {
     close() {
       console.log("Backdrop clicked → closing modal"); // debug
       this.$emit("update:modelValue", false);
-    }
-  }
-}
+    },
+  },
+};
 </script>

@@ -1,22 +1,26 @@
 // src/store/modules/routeLineages.js
-import RouteLineage from 'src/models/RouteLineage';
+import RouteLineage from "src/models/RouteLineage";
 
 function standardizePath(path) {
-  return typeof path === 'string' ? path.replace(/^\//, '') : '';
+  return typeof path === "string" ? path.replace(/^\//, "") : "";
 }
 
 function flattenRoutes(routes) {
   const flatRoutes = {};
 
-  function processRoute(route, parentPath = '') {
-    const standardizedPath = standardizePath(parentPath + '/' + standardizePath(route.path));
+  function processRoute(route, parentPath = "") {
+    const standardizedPath = standardizePath(
+      parentPath + "/" + standardizePath(route.path),
+    );
     flatRoutes[standardizedPath] = route;
     if (route.children && route.children.length > 0) {
-      route.children.forEach(subroute => processRoute(subroute, standardizedPath));
+      route.children.forEach((subroute) =>
+        processRoute(subroute, standardizedPath),
+      );
     }
   }
 
-  routes.forEach(route => processRoute(route));
+  routes.forEach((route) => processRoute(route));
   return flatRoutes;
 }
 
@@ -26,7 +30,7 @@ function processRouteForLineage(route, flatRoutes) {
   let currentRoute = route;
 
   while (currentRoute) {
-    const currentRouteName = currentRoute.name || '';
+    const currentRouteName = currentRoute.name || "";
     if (lineage.includes(currentRouteName)) break; // Break if lineage already includes the name to prevent infinite loop
 
     lineage.unshift(currentRouteName);
@@ -37,15 +41,19 @@ function processRouteForLineage(route, flatRoutes) {
       break;
     }
 
-    const parentRoute = parentRouteName ? flatRoutes[standardizePath(parentRouteName)] : null;
+    const parentRoute = parentRouteName
+      ? flatRoutes[standardizePath(parentRouteName)]
+      : null;
     currentRoute = parentRoute || null;
   }
 
-  const breadcrumbLabel = route.meta?.breadcrumbName || '';
+  const breadcrumbLabel = route.meta?.breadcrumbName || "";
   const routeLineageData = {
     label: breadcrumbLabel,
-    name: route.name || '',
-    parent: route.meta?.breadcrumbParentName ? standardizePath(route.meta.breadcrumbParentName) : null,
+    name: route.name || "",
+    parent: route.meta?.breadcrumbParentName
+      ? standardizePath(route.meta.breadcrumbParentName)
+      : null,
     lineage: lineage,
   };
 
@@ -55,10 +63,10 @@ function processRouteForLineage(route, flatRoutes) {
 }
 
 export function generateRouteLineages(routes) {
-  console.log('Generating route lineages...');
+  console.log("Generating route lineages...");
   const flatRoutes = flattenRoutes(routes);
-  Object.values(flatRoutes).forEach(route => {
+  Object.values(flatRoutes).forEach((route) => {
     processRouteForLineage(route, flatRoutes);
   });
-  console.log('Route lineages generated.');
+  console.log("Route lineages generated.");
 }

@@ -1,5 +1,5 @@
-import store from 'src/store'
+import store from "src/store";
 
 export default ({ app }) => {
-  app.use(store)
-}
+  app.use(store);
+};

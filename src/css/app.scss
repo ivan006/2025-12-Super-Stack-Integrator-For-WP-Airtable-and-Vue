@@ -1,7 +1,4 @@
-
 // app global css in SCSS form
-
-
 
 // breakpoint variable, from https://quasar.dev/style/breakpoints
 // Except the xs one because I think 600px is too small
@@ -57,8 +54,6 @@ $lg-breakpoint: 1920px;
 //   }
 // }
 
-
-
 //.text-subtitle1 {
 //  font-size: 1rem;
 //  font-weight: 400;
@@ -81,42 +76,33 @@ $lg-breakpoint: 1920px;
 //}
 
 .text-body3 {
-  font-size: 1.25rem;       /* 20px: 25% bigger than body1 (16px) */
-  font-weight: 400;         /* keep same weight for body tone */
-  line-height: 1.875rem;    /* proportional line height */
-  letter-spacing: 0.008em;  /* slightly tighter tracking */
+  font-size: 1.25rem; /* 20px: 25% bigger than body1 (16px) */
+  font-weight: 400; /* keep same weight for body tone */
+  line-height: 1.875rem; /* proportional line height */
+  letter-spacing: 0.008em; /* slightly tighter tracking */
 }
-
-
 
 .text-shadow-dark-1ry {
-  text-shadow: 
-  0 1px 5px rgba(0, 0, 0, 0.2), 
-  0 2px 2px rgba(0, 0, 0, 0.14), 
-  0 3px 1px rgba(0, 0, 0, 0.12)
-  
+  text-shadow: 0 1px 5px rgba(0, 0, 0, 0.2), 0 2px 2px rgba(0, 0, 0, 0.14),
+    0 3px 1px rgba(0, 0, 0, 0.12);
 }
-
 
 .text-shadow-light-1ry {
-  text-shadow: 0 1px 5px rgba(255, 255, 255, 0.2), 0 2px 2px rgba(255, 255, 255, 0.14), 0 3px 1px -2px rgba(255, 255, 255, 0.12);
+  text-shadow: 0 1px 5px rgba(255, 255, 255, 0.2),
+    0 2px 2px rgba(255, 255, 255, 0.14),
+    0 3px 1px -2px rgba(255, 255, 255, 0.12);
 }
 
-
-
-@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
-
-
+@import url("https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap");
 
 .font-1ry {
-  font-family: 'Montserrat', Arial;
+  font-family: "Montserrat", Arial;
 }
 .font-2ry {
-  font-family: 'Open Sans', Arial, Helvetica, sans-serif;
+  font-family: "Open Sans", Arial, Helvetica, sans-serif;
 }
-
 
 /* -------------------------
    Brand Color Utilities
@@ -128,15 +114,12 @@ $lg-breakpoint: 1920px;
 }
 
 .text-2ry-color {
- color: #757575 !important; /* Neutral Charcoal */
+  color: #757575 !important; /* Neutral Charcoal */
 }
 
 .text-3ry-color {
-  color: #C97B33 !important; /* Bright Green */
+  color: #c97b33 !important; /* Bright Green */
 }
-
-
-
 
 /* Background colors */
 .bg-1ry-color {
@@ -144,20 +127,17 @@ $lg-breakpoint: 1920px;
 }
 
 .bg-2ry-color {
-  background-color: #F7F7F7; /* Light Gray */
+  background-color: #f7f7f7; /* Light Gray */
 }
 
 .bg-3ry-color {
   // background-color: hsl(226, 54%, 51%) !important; /* Bright Green */
-  background: linear-gradient(135deg, #E8C547, #E0A96D, #C97B33);
-
-
+  background: linear-gradient(135deg, #e8c547, #e0a96d, #c97b33);
 }
 
 .border-1ry {
   border: 1px solid rgba(0, 0, 0, 0.12);
 }
-
 
 // -------------------------------
 
@@ -191,13 +171,6 @@ $lg-breakpoint: 1920px;
 //   box-shadow: 0 1px 5px rgba(255, 255, 255, 0.2), 0 2px 2px rgba(255, 255, 255, 0.14), 0 3px 1px -2px rgba(255, 255, 255, 0.12);
 // }
 
-
-
-
-
-
-
-
 // @media (min-width: 1920px) {
 //     responsive-r-font-h1 {font-size: 6rem;     line-height: 6rem;     letter-spacing: -.01562em; font-weight: 300;}
 //     responsive-r-font-h2 {font-size: 3.75rem;  line-height: 3.75rem;  letter-spacing: -.00833em; font-weight: 300;}
@@ -206,7 +179,6 @@ $lg-breakpoint: 1920px;
 //     responsive-r-font-h5 {font-size: 1.5rem;   line-height: 2rem;     letter-spacing: normal;    font-weight: 400;}
 //     responsive-r-font-h6 {font-size: 1.25rem;  line-height: 2rem;     letter-spacing: .0125em;   font-weight: 500;}
 // }
-
 
 // @media (max-width: 1919px) {
 //     // responsive-r-font-h1 {font-size: 6rem;     line-height: 6rem;     letter-spacing: -.01562em; font-weight: 300;}
@@ -217,16 +189,39 @@ $lg-breakpoint: 1920px;
 //     responsive-r-font-h4 {font-size: 1.25rem;  line-height: 2rem;     letter-spacing: .0125em;   font-weight: 500;}
 // }
 
-
-
-
-
-.r-font-h1 {font-size: 4.25rem;     }
-.r-font-h2 {font-size: 2.75rem;  line-height: 3.75rem;  letter-spacing: -.00833em; font-weight: 300;}
-.r-font-h3 {font-size: 2.25rem;     line-height: 3.125rem; letter-spacing: normal;    font-weight: 400;}
-.r-font-h4 {font-size: 1.755rem; line-height: 2.5rem;   letter-spacing: .00735em;  font-weight: 400;}
-.r-font-h5 {font-size: 1.5rem;   line-height: 2rem;     letter-spacing: normal;    font-weight: 400;}
-.r-font-h6 {font-size: 1.25rem;  line-height: 2rem;     letter-spacing: .0125em;   font-weight: 500;}
+.r-font-h1 {
+  font-size: 4.25rem;
+}
+.r-font-h2 {
+  font-size: 2.75rem;
+  line-height: 3.75rem;
+  letter-spacing: -0.00833em;
+  font-weight: 300;
+}
+.r-font-h3 {
+  font-size: 2.25rem;
+  line-height: 3.125rem;
+  letter-spacing: normal;
+  font-weight: 400;
+}
+.r-font-h4 {
+  font-size: 1.755rem;
+  line-height: 2.5rem;
+  letter-spacing: 0.00735em;
+  font-weight: 400;
+}
+.r-font-h5 {
+  font-size: 1.5rem;
+  line-height: 2rem;
+  letter-spacing: normal;
+  font-weight: 400;
+}
+.r-font-h6 {
+  font-size: 1.25rem;
+  line-height: 2rem;
+  letter-spacing: 0.0125em;
+  font-weight: 500;
+}
 
 // @media (min-width: 1920px) {
 //     .r-font-h1 {font-size: 6rem;     }
@@ -237,7 +232,6 @@ $lg-breakpoint: 1920px;
 //     .r-font-h6 {font-size: 1.25rem;  line-height: 2rem;     letter-spacing: .0125em;   font-weight: 500;}
 // }
 
-
 // @media (max-width: 1919px) {
 //     .r-font-h1 {font-size: 4.25rem;     }
 //     .r-font-h2 {font-size: 2.75rem;  line-height: 3.75rem;  letter-spacing: -.00833em; font-weight: 300;}
@@ -246,7 +240,6 @@ $lg-breakpoint: 1920px;
 //     .r-font-h5 {font-size: 1.5rem;   line-height: 2rem;     letter-spacing: normal;    font-weight: 400;}
 //     .r-font-h6 {font-size: 1.25rem;  line-height: 2rem;     letter-spacing: .0125em;   font-weight: 500;}
 // }
-
 
 /* For Quasar v2/Vue 3, use :deep() selector */
 .no-padding-dialog .q-dialog__inner--minimized {

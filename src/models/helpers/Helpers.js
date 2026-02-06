@@ -12,7 +12,6 @@ dayjs.extend(isBetween);
 dayjs.extend(advancedFormat);
 
 class Helpers {
-
   static formatCasualTime(start, end) {
     const now = dayjs();
     const startDate = dayjs(start);
@@ -39,7 +38,9 @@ class Helpers {
     let durationText;
     if (durationMinutes < 60) {
       const roundedMinutes = Math.round(durationMinutes / 30) * 0.5;
-      durationText = `~${roundedMinutes} minute${roundedMinutes !== 1 ? "s" : ""}`;
+      durationText = `~${roundedMinutes} minute${
+        roundedMinutes !== 1 ? "s" : ""
+      }`;
     } else if (durationHours < 24) {
       const roundedHours = Math.round(durationHours * 2) / 2;
       durationText = `~${roundedHours} hour${roundedHours !== 1 ? "s" : ""}`;
@@ -80,19 +81,29 @@ class Helpers {
       comingUpHint = "Event is happening now";
     } else if (timeUntilStart < 60) {
       const roundedMinutes = Math.round(timeUntilStart / 30) * 0.5;
-      comingUpHint = `~${roundedMinutes} minute${roundedMinutes !== 1 ? "s" : ""} from now`;
+      comingUpHint = `~${roundedMinutes} minute${
+        roundedMinutes !== 1 ? "s" : ""
+      } from now`;
     } else if (timeUntilStart < 1440) {
       const roundedHours = Math.round((timeUntilStart / 60) * 2) / 2;
-      comingUpHint = `~${roundedHours} hour${roundedHours !== 1 ? "s" : ""} from now`;
+      comingUpHint = `~${roundedHours} hour${
+        roundedHours !== 1 ? "s" : ""
+      } from now`;
     } else if (timeUntilStart < 10080) {
       const roundedDays = Math.round((timeUntilStart / 1440) * 2) / 2;
-      comingUpHint = `~${roundedDays} day${roundedDays !== 1 ? "s" : ""} from now`;
+      comingUpHint = `~${roundedDays} day${
+        roundedDays !== 1 ? "s" : ""
+      } from now`;
     } else if (timeUntilStart < 43800) {
       const roundedWeeks = Math.round((timeUntilStart / 10080) * 2) / 2;
-      comingUpHint = `~${roundedWeeks} week${roundedWeeks !== 1 ? "s" : ""} from now`;
+      comingUpHint = `~${roundedWeeks} week${
+        roundedWeeks !== 1 ? "s" : ""
+      } from now`;
     } else {
       const roundedMonths = Math.round((timeUntilStart / 43800) * 2) / 2;
-      comingUpHint = `~${roundedMonths} month${roundedMonths !== 1 ? "s" : ""} from now`;
+      comingUpHint = `~${roundedMonths} month${
+        roundedMonths !== 1 ? "s" : ""
+      } from now`;
     }
 
     return {

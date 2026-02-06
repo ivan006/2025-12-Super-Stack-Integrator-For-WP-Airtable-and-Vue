@@ -3,14 +3,8 @@ import { configure } from "quasar/wrappers";
 export default configure(function () {
   return {
     boot: ["qcalendar", "store", "vuex-orm-axios"],
-    css: [
-      "app.scss"
-    ],
-    extras: [
-      "roboto-font", 
-      "material-icons",
-      "mdi-v7",
-    ],
+    css: ["app.scss"],
+    extras: ["roboto-font", "material-icons", "mdi-v7"],
 
     build: {
       target: {
@@ -81,9 +75,7 @@ export default configure(function () {
       config: {
         brand: {},
       },
-      plugins: [
-        'Meta'
-      ],
+      plugins: ["Meta"],
     },
 
     animations: [],

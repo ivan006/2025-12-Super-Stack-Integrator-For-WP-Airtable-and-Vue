@@ -1,9 +1,6 @@
-import BasicModel from './BasicModel'
+import BasicModel from "./BasicModel";
 
 export default class Home_Page extends BasicModel {
-
-  static entity = 'Home_Page';
-  static entityUrl = '/Home_Page';
-
-
+  static entity = "Home_Page";
+  static entityUrl = "/Home_Page";
 }

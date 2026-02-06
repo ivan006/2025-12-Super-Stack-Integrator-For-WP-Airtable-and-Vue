@@ -1,10 +1,7 @@
 <template>
     <q-page class="q-pa-md">
-
         <!-- Page Title -->
-        <div class="text-h5 q-mb-sm">
-            Data Cache — Page Binder
-        </div>
+        <div class="text-h5 q-mb-sm">Data Cache — Page Binder</div>
 
         <!-- Intro -->
         <div class="text-body2 text-grey-7 q-mb-lg">
@@ -16,60 +13,85 @@
         <!-- Configuration -->
         <q-card flat bordered class="q-mb-md">
             <q-card-section>
-
-                <div class="text-subtitle1 q-mb-md">
-                    Configuration
-                </div>
+                <div class="text-subtitle1 q-mb-md">Configuration</div>
 
                 <div class="row q-col-gutter-md q-mb-md">
                     <div class="col-12 col-md-8">
-                        <q-input v-model="apiUrl" label="Airtable API URL" outlined dense />
+                        <q-input
+                            v-model="apiUrl"
+                            label="Airtable API URL"
+                            outlined
+                            dense
+                        />
                     </div>
 
                     <div class="col-12 col-md-4">
-                        <q-input v-model="attachmentPath" label="Attachment Path (optional)" outlined dense
-                            placeholder="Attachments[0].thumbnails.large.url" />
+                        <q-input
+                            v-model="attachmentPath"
+                            label="Attachment Path (optional)"
+                            outlined
+                            dense
+                            placeholder="Attachments[0].thumbnails.large.url"
+                        />
                     </div>
                 </div>
 
+                <q-btn
+                    label="Start Compilation"
+                    color="primary"
+                    unelevated
+                    :loading="loading"
+                    @click="startCompilation"
+                />
 
-                <q-btn label="Start Compilation" color="primary" unelevated :loading="loading"
-                    @click="startCompilation" />
-
-                <q-btn label="Clear Attachment Cache" color="negative" flat :loading="loading"
-                    @click="clearAttachmentCache" />
-
-
+                <q-btn
+                    label="Clear Attachment Cache"
+                    color="negative"
+                    flat
+                    :loading="loading"
+                    @click="clearAttachmentCache"
+                />
             </q-card-section>
         </q-card>
 
         <!-- Existing Bound Caches -->
         <q-card flat bordered class="q-mb-md">
             <q-card-section>
+                <div class="text-subtitle1 q-mb-md">Existing Bound Caches</div>
 
-                <div class="text-subtitle1 q-mb-md">
-                    Existing Bound Caches
-                </div>
-
-                <q-table flat bordered dense row-key="file" :rows="caches" :columns="columns"
-                    no-data-label="No bound caches found" table-style="table-layout: fixed; width: 100%;" hide-bottom>
+                <q-table
+                    flat
+                    bordered
+                    dense
+                    row-key="file"
+                    :rows="caches"
+                    :columns="columns"
+                    no-data-label="No bound caches found"
+                    table-style="table-layout: fixed; width: 100%;"
+                    hide-bottom
+                >
                     <template v-slot:body-cell-actions="props">
                         <q-td align="right">
-                            <q-btn size="sm" flat label="View" @click="viewCache(props.row.source_url)" />
-                            <q-btn size="sm" flat color="negative" label="Delete" @click="deleteCache(props.row)" />
+                            <q-btn
+                                size="sm"
+                                flat
+                                label="View"
+                                @click="viewCache(props.row.source_url)"
+                            />
+                            <q-btn
+                                size="sm"
+                                flat
+                                color="negative"
+                                label="Delete"
+                                @click="deleteCache(props.row)"
+                            />
                         </q-td>
                     </template>
-
                 </q-table>
-
             </q-card-section>
         </q-card>
         <div class="row q-col-gutter-md q-mb-md">
-
-
             <div class="col-12 col-md-6">
-
-
                 <!-- Compilation Status -->
                 <q-card flat bordered class="q-mb-md">
                     <q-card-section>
@@ -77,9 +99,12 @@
                             Compilation Status
                         </div>
 
-                        <div class="row q-col-gutter-md items-center text-body2">
+                        <div
+                            class="row q-col-gutter-md items-center text-body2"
+                        >
                             <div class="col-auto">
-                                Items fetched: <strong>{{ itemsFetched }}</strong>
+                                Items fetched:
+                                <strong>{{ itemsFetched }}</strong>
                             </div>
 
                             <div class="col-auto">
@@ -90,370 +115,402 @@
                                 Elapsed time: <strong>{{ elapsedTime }}</strong>
                             </div>
 
-
-
                             <div v-if="status" class="col-auto">
                                 {{ status }}
                             </div>
                         </div>
                     </q-card-section>
-
                 </q-card>
-
             </div>
             <div class="col-12 col-md-6">
-
                 <!-- Attachment Progress -->
                 <q-card flat bordered class="q-mb-md">
                     <q-card-section>
-                        <div class="text-subtitle1 q-mb-sm">Attachment Progress</div>
+                        <div class="text-subtitle1 q-mb-sm">
+                            Attachment Progress
+                        </div>
 
-                        <q-linear-progress :value="attachmentProgress" color="green" stripe class="q-mb-sm" />
+                        <q-linear-progress
+                            :value="attachmentProgress"
+                            color="green"
+                            stripe
+                            class="q-mb-sm"
+                        />
 
                         <div class="text-caption">
-                            {{ attachmentLoaded }} / {{ attachmentTotal }} attachments
+                            {{ attachmentLoaded }} /
+                            {{ attachmentTotal }} attachments
                         </div>
                     </q-card-section>
                 </q-card>
             </div>
         </div>
 
-
-
         <!-- Attachment Grid -->
         <q-card flat bordered v-if="attachmentImages.length">
             <q-card-section>
                 <div class="row q-col-gutter-sm">
-                    <div v-for="(img, i) in attachmentImages" :key="i" class="col-auto">
-                        <img :src="img" style="width:120px;height:120px;object-fit:cover;border-radius:6px" />
+                    <div
+                        v-for="(img, i) in attachmentImages"
+                        :key="i"
+                        class="col-auto"
+                    >
+                        <img
+                            :src="img"
+                            style="
+                                width: 120px;
+                                height: 120px;
+                                object-fit: cover;
+                                border-radius: 6px;
+                            "
+                        />
                     </div>
                 </div>
             </q-card-section>
         </q-card>
-
     </q-page>
 </template>
 
 <script>
 export default {
-    name: 'DataCacheBinder',
+    name: "DataCacheBinder",
 
     data() {
         return {
-            apiUrl: '',
-            attachmentPath: '',
+            apiUrl: "",
+            attachmentPath: "",
             loading: false,
-            status: '',
-            itemsFetched: '—',
-            elapsedTime: '—',
+            status: "",
+            itemsFetched: "—",
+            elapsedTime: "—",
             caches: [],
-            columns: [{
-                name: 'source_url',
-                label: 'Source URL',
-                field: row => row.source_url || row.file,
-                style: 'white-space: normal; word-break: break-all;',
-            },
-            {
-                name: 'size',
-                label: 'Size (KB)',
-                field: row => (row.size / 1024).toFixed(1),
-                align: 'right'
-            },
-            {
-                name: 'created_at',
-                label: 'Created',
-                field: 'created_at'
-            },
-            {
-                name: 'actions',
-                label: 'Actions',
-                align: 'right',
-                style: 'width: 120px;'
-            },
-
+            columns: [
+                {
+                    name: "source_url",
+                    label: "Source URL",
+                    field: (row) => row.source_url || row.file,
+                    style: "white-space: normal; word-break: break-all;",
+                },
+                {
+                    name: "size",
+                    label: "Size (KB)",
+                    field: (row) => (row.size / 1024).toFixed(1),
+                    align: "right",
+                },
+                {
+                    name: "created_at",
+                    label: "Created",
+                    field: "created_at",
+                },
+                {
+                    name: "actions",
+                    label: "Actions",
+                    align: "right",
+                    style: "width: 120px;",
+                },
             ],
             attachmentImages: [],
             attachmentTotal: 0,
             attachmentLoaded: 0,
             attachmentProgress: 0,
-
-
-        }
+        };
     },
 
     mounted() {
-        this.listCaches()
+        this.listCaches();
     },
 
     methods: {
         async deleteCache(row) {
-            if (!row?.file) return
+            if (!row?.file) return;
 
-            if (!confirm(`Delete bound cache?\n\n${row.source_url || row.file}`)) {
-                return
+            if (
+                !confirm(`Delete bound cache?\n\n${row.source_url || row.file}`)
+            ) {
+                return;
             }
 
-            this.status = `🗑️ Deleting cache…`
-            this.loading = true
+            this.status = `🗑️ Deleting cache…`;
+            this.loading = true;
 
             try {
-                const CACHE_BASE = import.meta.env.VITE_CACHE_BASE || ''
+                const CACHE_BASE = import.meta.env.VITE_CACHE_BASE || "";
                 const res = await fetch(
-                    `${CACHE_BASE}/data-cache/bound-cache.php?action=delete&file=${encodeURIComponent(row.file)}`
-                )
-                const data = await res.json()
+                    `${CACHE_BASE}/data-cache/bound-cache.php?action=delete&file=${encodeURIComponent(
+                        row.file,
+                    )}`,
+                );
+                const data = await res.json();
 
                 if (data.deleted) {
-                    this.status = '✅ Cache deleted'
-                    await this.listCaches()
+                    this.status = "✅ Cache deleted";
+                    await this.listCaches();
                 } else {
-                    this.status = '⚠️ Could not delete cache'
+                    this.status = "⚠️ Could not delete cache";
                 }
             } catch (e) {
-                this.status = `❌ Error deleting cache: ${e.message}`
+                this.status = `❌ Error deleting cache: ${e.message}`;
             } finally {
-                this.loading = false
+                this.loading = false;
             }
         },
         async touchAttachments(records, attachmentPath) {
-            if (!attachmentPath) return
+            if (!attachmentPath) return;
 
-            const parts = attachmentPath.split('.')
-            const urls = []
+            const parts = attachmentPath.split(".");
+            const urls = [];
 
             // extract URLs (unchanged logic)
-            records.forEach(r => {
-                let val = r.fields
+            records.forEach((r) => {
+                let val = r.fields;
                 for (const p of parts) {
-                    const m = p.match(/^(.+)\[(\d+)\]$/)
+                    const m = p.match(/^(.+)\[(\d+)\]$/);
                     if (m) {
-                        val = Array.isArray(val?.[m[1]]) ? val[m[1]][+m[2]] : null
+                        val = Array.isArray(val?.[m[1]])
+                            ? val[m[1]][+m[2]]
+                            : null;
                     } else {
-                        val = val?.[p]
+                        val = val?.[p];
                     }
                 }
 
                 if (Array.isArray(val)) {
-                    val.forEach(v => urls.push(v.url || v))
-                } else if (typeof val === 'string') {
-                    urls.push(val)
+                    val.forEach((v) => urls.push(v.url || v));
+                } else if (typeof val === "string") {
+                    urls.push(val);
                 }
-            })
+            });
 
-            this.attachmentImages = []
-            this.attachmentTotal = urls.length
-            this.attachmentLoaded = 0
-            this.attachmentProgress = 0
+            this.attachmentImages = [];
+            this.attachmentTotal = urls.length;
+            this.attachmentLoaded = 0;
+            this.attachmentProgress = 0;
 
-            const CACHE_BASE = import.meta.env.VITE_CACHE_BASE || ''
+            const CACHE_BASE = import.meta.env.VITE_CACHE_BASE || "";
 
             // 🔥 PARALLEL IMAGE TOUCHING
-            const promises = urls.map(url => {
-                return new Promise(resolve => {
-                    const proxied = `${CACHE_BASE}/data-cache/index.php?url=${encodeURIComponent(url)}`
-                    const img = new Image()
-                    img.src = proxied
+            const promises = urls.map((url) => {
+                return new Promise((resolve) => {
+                    const proxied = `${CACHE_BASE}/data-cache/index.php?url=${encodeURIComponent(
+                        url,
+                    )}`;
+                    const img = new Image();
+                    img.src = proxied;
 
                     img.onload = img.onerror = () => {
-                        this.attachmentLoaded++
+                        this.attachmentLoaded++;
                         this.attachmentProgress =
-                            this.attachmentLoaded / this.attachmentTotal
-                        this.attachmentImages.unshift(proxied)
-                        resolve()
-                    }
-                })
-            })
+                            this.attachmentLoaded / this.attachmentTotal;
+                        this.attachmentImages.unshift(proxied);
+                        resolve();
+                    };
+                });
+            });
 
             // wait for all (optional – remove if you want pure fire-and-forget)
-            await Promise.all(promises)
+            await Promise.all(promises);
         },
         async fetchAllPages(url) {
-            let records = []
-            let offset = null
-            let page = 1
+            let records = [];
+            let offset = null;
+            let page = 1;
 
-            const start = Date.now()
+            const start = Date.now();
 
             do {
-                this.status = `Fetching page ${page}…`
+                this.status = `Fetching page ${page}…`;
 
                 const pageUrl = offset
                     ? `${url}&offset=${encodeURIComponent(offset)}`
-                    : url
+                    : url;
 
-                const CACHE_BASE = import.meta.env.VITE_CACHE_BASE || ''
+                const CACHE_BASE = import.meta.env.VITE_CACHE_BASE || "";
                 const res = await fetch(
-                    `${CACHE_BASE}/data-cache/index.php?regenerate=${encodeURIComponent(pageUrl)}`
-                )
+                    `${CACHE_BASE}/data-cache/index.php?regenerate=${encodeURIComponent(
+                        pageUrl,
+                    )}`,
+                );
 
-                const data = await res.json()
+                const data = await res.json();
 
-                records.push(...(data.records || []))
-                offset = data.offset
-                page++
+                records.push(...(data.records || []));
+                offset = data.offset;
+                page++;
 
-                this.itemsFetched = records.length
-                this.elapsedTime = `${Math.floor((Date.now() - start) / 1000)}s`
+                this.itemsFetched = records.length;
+                this.elapsedTime = `${Math.floor(
+                    (Date.now() - start) / 1000,
+                )}s`;
+            } while (offset);
 
-            } while (offset)
-
-            return records
+            return records;
         },
 
         async clearAttachmentCache() {
             if (!this.attachmentPath) {
-                this.status = 'No attachment path provided.'
-                return
+                this.status = "No attachment path provided.";
+                return;
             }
 
-            if (!confirm('Clear cached attachments for this dataset?')) {
-                return
+            if (!confirm("Clear cached attachments for this dataset?")) {
+                return;
             }
 
-            this.loading = true
-            this.status = 'Clearing attachment cache…'
+            this.loading = true;
+            this.status = "Clearing attachment cache…";
 
             try {
                 // Load records the same way compilation does
-                const CACHE_BASE = import.meta.env.VITE_CACHE_BASE || ''
+                const CACHE_BASE = import.meta.env.VITE_CACHE_BASE || "";
 
                 const res = await fetch(
-                    `${CACHE_BASE}/data-cache/bound-cache.php?action=get&url=${encodeURIComponent(this.apiUrl)}`
-                )
-                const data = await res.json()
-                const records = data.records || []
+                    `${CACHE_BASE}/data-cache/bound-cache.php?action=get&url=${encodeURIComponent(
+                        this.apiUrl,
+                    )}`,
+                );
+                const data = await res.json();
+                const records = data.records || [];
 
                 // 🔁 SAME PATH RESOLUTION LOGIC
-                const parts = this.attachmentPath.split('.')
-                const urls = []
+                const parts = this.attachmentPath.split(".");
+                const urls = [];
 
-                records.forEach(r => {
-                    let val = r.fields
+                records.forEach((r) => {
+                    let val = r.fields;
                     for (const p of parts) {
-                        const m = p.match(/^(.+)\[(\d+)\]$/)
+                        const m = p.match(/^(.+)\[(\d+)\]$/);
                         if (m) {
-                            val = Array.isArray(val?.[m[1]]) ? val[m[1]][+m[2]] : null
+                            val = Array.isArray(val?.[m[1]])
+                                ? val[m[1]][+m[2]]
+                                : null;
                         } else {
-                            val = val?.[p]
+                            val = val?.[p];
                         }
                     }
 
                     if (Array.isArray(val)) {
-                        val.forEach(v => urls.push(v.url || v))
-                    } else if (typeof val === 'string') {
-                        urls.push(val)
+                        val.forEach((v) => urls.push(v.url || v));
+                    } else if (typeof val === "string") {
+                        urls.push(val);
                     }
-                })
+                });
 
                 // 🔥 DELETE EACH CACHED FILE
-                let deleted = 0
+                let deleted = 0;
 
                 for (const url of urls) {
                     await fetch(
-
-                        `${CACHE_BASE}/data-cache/index.php?delete=${encodeURIComponent(url)}`
-                    )
-                    deleted++
+                        `${CACHE_BASE}/data-cache/index.php?delete=${encodeURIComponent(
+                            url,
+                        )}`,
+                    );
+                    deleted++;
                 }
 
-                this.status = `🧹 Cleared ${deleted} attachment caches`
-
+                this.status = `🧹 Cleared ${deleted} attachment caches`;
             } catch (e) {
-                this.status = `❌ Failed: ${e.message}`
+                this.status = `❌ Failed: ${e.message}`;
             } finally {
-                this.loading = false
+                this.loading = false;
             }
         },
         async startCompilation() {
             if (!this.apiUrl) {
-                this.status = 'Please enter an Airtable API URL.'
-                return
+                this.status = "Please enter an Airtable API URL.";
+                return;
             }
 
-            this.loading = true
-            this.status = 'Checking for existing bound cache…'
-            this.itemsFetched = 0
-            this.elapsedTime = '0s'
+            this.loading = true;
+            this.status = "Checking for existing bound cache…";
+            this.itemsFetched = 0;
+            this.elapsedTime = "0s";
 
             try {
-                const CACHE_BASE = import.meta.env.VITE_CACHE_BASE || ''
+                const CACHE_BASE = import.meta.env.VITE_CACHE_BASE || "";
 
                 // 🔹 CHECK EXISTING BOUND CACHE (minimal)
                 const list = await fetch(
-                    `${CACHE_BASE}/data-cache/bound-cache.php?action=list`
-                ).then(r => r.json())
+                    `${CACHE_BASE}/data-cache/bound-cache.php?action=list`,
+                ).then((r) => r.json());
 
                 const hashBuffer = await crypto.subtle.digest(
-                    'SHA-256',
-                    new TextEncoder().encode(this.apiUrl)
-                )
+                    "SHA-256",
+                    new TextEncoder().encode(this.apiUrl),
+                );
                 const hashHex = [...new Uint8Array(hashBuffer)]
-                    .map(b => b.toString(16).padStart(2, '0'))
-                    .join('')
-                const filename = `bound-${hashHex}.json`
+                    .map((b) => b.toString(16).padStart(2, "0"))
+                    .join("");
+                const filename = `bound-${hashHex}.json`;
 
-                const existing = list.find(c => c.file === filename)
+                const existing = list.find((c) => c.file === filename);
 
-                let records
+                let records;
 
                 if (existing) {
                     // ✅ USE EXISTING CACHE
-                    this.status = 'Using existing bound cache…'
+                    this.status = "Using existing bound cache…";
                     const res = await fetch(
-                        `${CACHE_BASE}/data-cache/bound-cache.php?action=get&url=${encodeURIComponent(this.apiUrl)}`
-                    )
-                    const data = await res.json()
-                    records = data.records || []
-                    this.itemsFetched = records.length
+                        `${CACHE_BASE}/data-cache/bound-cache.php?action=get&url=${encodeURIComponent(
+                            this.apiUrl,
+                        )}`,
+                    );
+                    const data = await res.json();
+                    records = data.records || [];
+                    this.itemsFetched = records.length;
                 } else {
                     // 🔹 ORIGINAL FLOW (UNCHANGED)
-                    this.status = 'Starting compilation…'
-                    const start = Date.now()
+                    this.status = "Starting compilation…";
+                    const start = Date.now();
 
-                    records = await this.fetchAllPages(this.apiUrl)
+                    records = await this.fetchAllPages(this.apiUrl);
 
-                    const duration = ((Date.now() - start) / 1000).toFixed(2)
+                    const duration = ((Date.now() - start) / 1000).toFixed(2);
 
                     await fetch(
-                        `${CACHE_BASE}/data-cache/bound-cache.php?action=save&url=${encodeURIComponent(this.apiUrl)}`,
+                        `${CACHE_BASE}/data-cache/bound-cache.php?action=save&url=${encodeURIComponent(
+                            this.apiUrl,
+                        )}`,
                         {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ records, duration })
-                        }
-                    )
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ records, duration }),
+                        },
+                    );
                 }
 
                 // 🔹 ATTACHMENTS (UNCHANGED)
                 if (this.attachmentPath) {
-                    this.status = 'Caching attachments…'
-                    await this.touchAttachments(records, this.attachmentPath)
+                    this.status = "Caching attachments…";
+                    await this.touchAttachments(records, this.attachmentPath);
                 }
 
-                this.status = `✅ Done (${records.length} records)`
-                this.listCaches()
-
+                this.status = `✅ Done (${records.length} records)`;
+                this.listCaches();
             } catch (e) {
-                this.status = `❌ Error: ${e.message}`
+                this.status = `❌ Error: ${e.message}`;
             } finally {
-                this.loading = false
+                this.loading = false;
             }
         },
 
         async listCaches() {
-            const CACHE_BASE = import.meta.env.VITE_CACHE_BASE || ''
-            const res = await fetch(`${CACHE_BASE}/data-cache/bound-cache.php?action=list`)
-            this.caches = await res.json()
+            const CACHE_BASE = import.meta.env.VITE_CACHE_BASE || "";
+            const res = await fetch(
+                `${CACHE_BASE}/data-cache/bound-cache.php?action=list`,
+            );
+            this.caches = await res.json();
         },
 
         viewCache(url) {
-            const CACHE_BASE = import.meta.env.VITE_CACHE_BASE || ''
-            if (!url) return
+            const CACHE_BASE = import.meta.env.VITE_CACHE_BASE || "";
+            if (!url) return;
             window.open(
-                `${CACHE_BASE}/data-cache/bound-cache.php?action=get&url=${encodeURIComponent(url)}`,
-                '_blank'
-            )
-        }
-    }
-}
+                `${CACHE_BASE}/data-cache/bound-cache.php?action=get&url=${encodeURIComponent(
+                    url,
+                )}`,
+                "_blank",
+            );
+        },
+    },
+};
 </script>

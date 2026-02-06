@@ -1,4 +1,4 @@
-#  Superstack Integrators - For Wordpress, Airtable and Vue
+# Superstack Integrators - For Wordpress, Airtable and Vue
 
 ## Overview
 
@@ -12,12 +12,11 @@ This approach prioritises rapid development, lower cost, and experimentation. By
 
 portal -> data acceptance -> cms -> data caching -> site -> html caching -> seo
 
-
 ## 🧊 Data and Page
 
 A **Vue-based caching service** for websites built with **Vue + Airtable**, designed to improve **performance, SEO, and stability** by caching both **API data** and **fully rendered HTML pages**.
 
-This project is **not the website itself** — it is a **cache management service** that lives *alongside* the target site inside the same webroot.
+This project is **not the website itself** — it is a **cache management service** that lives _alongside_ the target site inside the same webroot.
 
 ---
 
@@ -29,16 +28,16 @@ This project is **not the website itself** — it is a **cache management servic
   /integrator      → This caching service (Vue UI + PHP cache engine)
 ```
 
-* The **target website** lives at the webroot (`/`)
-* The **caching service** lives in `/integrator`
-* The cacher **reads and writes files into the parent directory**
-* Same-origin is assumed (full control of the site)
+- The **target website** lives at the webroot (`/`)
+- The **caching service** lives in `/integrator`
+- The cacher **reads and writes files into the parent directory**
+- Same-origin is assumed (full control of the site)
 
 This allows the service to:
 
-* Fetch live Vue-rendered pages
-* Save static HTML directly into the site
-* Proxy and cache Airtable API requests safely
+- Fetch live Vue-rendered pages
+- Save static HTML directly into the site
+- Proxy and cache Airtable API requests safely
 
 ---
 
@@ -56,18 +55,18 @@ A **generic HTTP proxy cache** used primarily for Airtable API calls.
 
 **Features**
 
-* URL + method–based caching
-* Supports GET, POST, PUT, DELETE
-* Optional forced regeneration
-* Header passthrough
-* OAuth support
-* Attachment/image proxying
+- URL + method–based caching
+- Supports GET, POST, PUT, DELETE
+- Optional forced regeneration
+- Header passthrough
+- OAuth support
+- Attachment/image proxying
 
 **Use cases**
 
-* Avoid Airtable rate limits
-* Cache image attachments
-* Speed up repeated API calls
+- Avoid Airtable rate limits
+- Cache image attachments
+- Speed up repeated API calls
 
 ---
 
@@ -77,16 +76,16 @@ A **dataset compiler** for Airtable.
 
 **What it does**
 
-* Fetches *all paginated pages* from Airtable
-* Merges them into **one JSON file**
-* Stores compile metadata (record count, duration, source URL)
-* Optionally pre-caches attachments via the data proxy
+- Fetches _all paginated pages_ from Airtable
+- Merges them into **one JSON file**
+- Stores compile metadata (record count, duration, source URL)
+- Optionally pre-caches attachments via the data proxy
 
 **Use cases**
 
-* Large Airtable tables (100–10k+ records)
-* Predictable, fast-loading datasets
-* Reduced client-side pagination logic
+- Large Airtable tables (100–10k+ records)
+- Predictable, fast-loading datasets
+- Reduced client-side pagination logic
 
 ---
 
@@ -102,56 +101,57 @@ All HTML caching is done by:
 
 #### 3️⃣ HTML – Cache from URL
 
-* Cache a single Vue route
-* Saves rendered HTML to disk
-* Cleans output by removing:
+- Cache a single Vue route
+- Saves rendered HTML to disk
+- Cleans output by removing:
 
-  * JSON-LD
-  * canonical links
-  * OG / Twitter meta
-  * Google Tag Manager
+  - JSON-LD
+  - canonical links
+  - OG / Twitter meta
+  - Google Tag Manager
 
 **Use cases**
 
-* SEO-critical landing pages
-* Manual page freezing
+- SEO-critical landing pages
+- Manual page freezing
 
 ---
 
 #### 4️⃣ HTML – Cache from List
 
-* Uses a predefined `pages.json`
-* Allows multi-select
-* Cache or delete pages in bulk
-* Homepage handled with backup/restore logic
+- Uses a predefined `pages.json`
+- Allows multi-select
+- Cache or delete pages in bulk
+- Homepage handled with backup/restore logic
 
 **Use cases**
 
-* Controlled, explicit page caching
-* Editorial or curated sites
+- Controlled, explicit page caching
+- Editorial or curated sites
 
 ---
 
 #### 5️⃣ HTML – Cache from Sitemap
 
-* Reads sitemap URLs from `sitemaps.json`
-* Supports:
+- Reads sitemap URLs from `sitemaps.json`
+- Supports:
 
-  * Normal sitemaps (`<urlset>`)
-  * Sitemap indexes (`<sitemapindex>`)
-* Sitemap indexes expand into **sub-sitemap tabs**
-* URLs are:
+  - Normal sitemaps (`<urlset>`)
+  - Sitemap indexes (`<sitemapindex>`)
 
-  * Stripped of protocol + domain
-  * Treated identically to `pages.json` entries
-  * Grouped into batches of 10
-  * Selectable per-group or globally
+- Sitemap indexes expand into **sub-sitemap tabs**
+- URLs are:
+
+  - Stripped of protocol + domain
+  - Treated identically to `pages.json` entries
+  - Grouped into batches of 10
+  - Selectable per-group or globally
 
 **Use cases**
 
-* SEO-driven caching
-* Large dynamic catalogs
-* Align cached pages with real crawl structure
+- SEO-driven caching
+- Large dynamic catalogs
+- Align cached pages with real crawl structure
 
 ---
 
@@ -160,10 +160,7 @@ All HTML caching is done by:
 #### `pages.json`
 
 ```json
-[
-  "/all-artworks/fine-art/all-price-ranges/",
-  "/all-artists/all-media/"
-]
+["/all-artworks/fine-art/all-price-ranges/", "/all-artists/all-media/"]
 ```
 
 ---
@@ -172,9 +169,7 @@ All HTML caching is done by:
 
 ```json
 {
-  "sitemaps": [
-    "https://example.com/sitemaps/sitemap-index.xml"
-  ]
+  "sitemaps": ["https://example.com/sitemaps/sitemap-index.xml"]
 }
 ```
 
@@ -184,34 +179,34 @@ All HTML caching is done by:
 
 ### 🧩 UI Stack
 
-* Vue (Options API)
-* Quasar UI components
-* Utility classes / inline styles only
-* Modular design (sitemap list handled via subcomponent)
+- Vue (Options API)
+- Quasar UI components
+- Utility classes / inline styles only
+- Modular design (sitemap list handled via subcomponent)
 
 Main UI components:
 
-* `DataCacheBinder.vue`
-* `HtmlCachePages.vue`
-* `HtmlCachePageHelper.vue`
+- `DataCacheBinder.vue`
+- `HtmlCachePages.vue`
+- `HtmlCachePageHelper.vue`
 
 ---
 
 ### 🔐 Assumptions & Constraints
 
-* Full control of the target website
-* Same-origin required (iframes + file writes)
-* HTML caching tested on staging/production (not local)
-* Apache/Nginx configured to allow PHP execution in `/integrator`
+- Full control of the target website
+- Same-origin required (iframes + file writes)
+- HTML caching tested on staging/production (not local)
+- Apache/Nginx configured to allow PHP execution in `/integrator`
 
 ---
 
 ### ❌ What This Is NOT
 
-* Not SSR
-* Not a CDN
-* Not a headless CMS
-* Not framework-specific beyond Vue
+- Not SSR
+- Not a CDN
+- Not a headless CMS
+- Not framework-specific beyond Vue
 
 This is a **pragmatic, site-owned caching layer**.
 
@@ -219,12 +214,9 @@ This is a **pragmatic, site-owned caching layer**.
 
 ### 🎯 Why This Exists
 
-* Vue SPAs are fast — but invisible to crawlers
-* Airtable is flexible — but rate-limited
-* This service bridges the gap **without changing your app architecture**
-
-
-
+- Vue SPAs are fast — but invisible to crawlers
+- Airtable is flexible — but rate-limited
+- This service bridges the gap **without changing your app architecture**
 
 ## Data Acceptance (IRIS — Ivan’s Robust Integration System)
 
@@ -256,5 +248,5 @@ IRIS can require **moderator approval** before changes are committed, enabling c
 
 #### Notes
 
-* IRIS also supports **image and media syncing** (adapter-specific where necessary)
-* The system is **target- and source-agnostic**, where practical
+- IRIS also supports **image and media syncing** (adapter-specific where necessary)
+- The system is **target- and source-agnostic**, where practical
