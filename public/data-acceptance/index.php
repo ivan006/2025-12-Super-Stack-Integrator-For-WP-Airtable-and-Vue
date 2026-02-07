@@ -45,6 +45,62 @@ $env = json_decode(file_get_contents($envPath), true);
  * -------------------------------------------------
  */
 
+function fetchSource($env, $entity, $id)
+{
+
+   // Validate source entity
+  $allowed = false;
+  foreach ($env['entities'] as $e) {
+    if (($e['source_entity_name'] ?? null) === $entity) {
+      $allowed = true;
+      break;
+    }
+  }
+
+  if (!$allowed) {
+    http_response_code(404);
+    echo json_encode(['error' => 'Source entity not allowed']);
+    exit;
+  }
+
+  $baseUrl = rtrim($env['source']['base_url'], '/');
+  $url = $baseUrl . '/' . rawurlencode($entity) . '/' . rawurlencode($id);
+
+  $client = new CurlClient(false);
+  $bodyStream = fopen('php://temp', 'w+');
+
+  $info = $client->get($url, [], $bodyStream);
+
+  if (!$info || ($info['http_code'] ?? 500) >= 400) {
+    http_response_code(502);
+    echo json_encode([
+      'error' => 'Failed to fetch source record',
+      'http_code' => $info['http_code'] ?? null
+    ], JSON_PRETTY_PRINT);
+    exit;
+  }
+
+  rewind($bodyStream);
+  $data = json_decode(stream_get_contents($bodyStream), true);
+  fclose($bodyStream);
+
+  // Find entity mapping
+  $entityMap = null;
+  foreach ($env['entities'] as $e) {
+    if (($e['source_entity_name'] ?? null) === $entity) {
+      $entityMap = $e;
+      break;
+    }
+  }
+
+  $normData = $entityMap
+    ? normalizeStructure($data, $entityMap, 'source')
+    : [];
+
+
+
+}
+
 /**
  * -------------------------------------------------
  * Routing
