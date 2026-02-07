@@ -47,17 +47,16 @@ $env = json_decode(file_get_contents($envPath), true);
 
 function fetchSource($env, $entity, $id)
 {
-
-   // Validate source entity
-  $allowed = false;
+  // Validate source entity
+  $entityMap = null;
   foreach ($env['entities'] as $e) {
     if (($e['source_entity_name'] ?? null) === $entity) {
-      $allowed = true;
+      $entityMap = $e;
       break;
     }
   }
 
-  if (!$allowed) {
+  if (!$entityMap) {
     http_response_code(404);
     echo json_encode(['error' => 'Source entity not allowed']);
     exit;
@@ -84,21 +83,11 @@ function fetchSource($env, $entity, $id)
   $data = json_decode(stream_get_contents($bodyStream), true);
   fclose($bodyStream);
 
-  // Find entity mapping
-  $entityMap = null;
-  foreach ($env['entities'] as $e) {
-    if (($e['source_entity_name'] ?? null) === $entity) {
-      $entityMap = $e;
-      break;
-    }
-  }
-
-  $normData = $entityMap
-    ? normalizeStructure($data, $entityMap, 'source')
-    : [];
-
-
-
+  return [
+    'entity_map' => $entityMap,
+    'raw_data'  => $data,
+    'norm_data' => normalizeStructure($data, $entityMap, 'source')
+  ];
 }
 
 /**
