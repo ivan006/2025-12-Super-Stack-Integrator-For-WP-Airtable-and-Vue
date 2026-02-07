@@ -2,23 +2,29 @@
   <q-page class="q-pa-md">
     <div class="text-h5 q-mb-md">My-Listing → Airtable Sync</div>
 
+    <!-- SHARED ENTITY -->
+    <q-card flat bordered class="q-mb-md">
+      <q-card-section>
+        <div class="text-subtitle1 q-mb-sm">Entity</div>
+
+        <q-select
+          v-model="entity"
+          :options="entities"
+          emit-value
+          map-options
+          label="Entity"
+          outlined
+          dense
+        />
+      </q-card-section>
+    </q-card>
+
     <div class="row q-col-gutter-md q-mb-md">
       <!-- SOURCE -->
       <div class="col-12 col-md-6">
         <q-card flat bordered>
           <q-card-section>
             <div class="text-subtitle1 q-mb-sm">Source</div>
-
-            <q-select
-              v-model="source.entity"
-              :options="sourceEntities"
-              emit-value
-              map-options
-              label="Source Entity"
-              outlined
-              dense
-              class="q-mb-sm"
-            />
 
             <q-input
               v-model="source.id"
@@ -44,17 +50,6 @@
         <q-card flat bordered>
           <q-card-section>
             <div class="text-subtitle1 q-mb-sm">Target</div>
-
-            <q-select
-              v-model="target.entity"
-              :options="targetEntities"
-              emit-value
-              map-options
-              label="Target Entity"
-              outlined
-              dense
-              class="q-mb-sm"
-            />
 
             <q-input
               v-model="target.id"
@@ -93,11 +88,12 @@
                 overflow: auto;
                 font-size: 12px;
               "
-              >{{ source.data }}
-            </pre>
+              >{{ source.data }}</pre
+            >
           </q-card-section>
         </q-card>
       </div>
+
       <div class="col-12 col-md-6">
         <q-card flat bordered>
           <q-card-section>
@@ -113,8 +109,8 @@
                 overflow: auto;
                 font-size: 12px;
               "
-              >{{ target.data }}
-            </pre>
+              >{{ targetData }}</pre
+            >
           </q-card-section>
         </q-card>
       </div>
@@ -128,21 +124,28 @@ export default {
 
   data() {
     return {
+      entity: null,
+
       source: {
-        entity: null,
         id: "",
         data: null,
         loading: false,
       },
+
       target: {
-        entity: null,
         id: "",
-        data: null,
         loading: false,
+        _data: null,
       },
-      sourceEntities: [],
-      targetEntities: [],
+
+      entities: [],
     };
+  },
+
+  computed: {
+    targetData() {
+      return this.target._data;
+    },
   },
 
   async mounted() {
@@ -157,40 +160,42 @@ export default {
       );
       const json = await res.json();
 
-      this.sourceEntities = [
-        ...new Set(json.entities.map((e) => e.source_entity_name)),
-      ].map((v) => ({ label: v, value: v }));
-
-      this.targetEntities = [
-        ...new Set(json.entities.map((e) => e.target_entity_name)),
-      ].map((v) => ({ label: v, value: v }));
+      this.entities = json.entities.map((e) => ({
+        label: `${e.source_entity_name} → ${e.target_entity_name}`,
+        value: {
+          source: e.source_entity_name,
+          target: e.target_entity_name,
+        },
+      }));
     },
 
     async fetchSource() {
-      if (!this.source.entity || !this.source.id) return;
+      if (!this.entity || !this.source.id) return;
       this.source.loading = true;
 
       const base = import.meta.env.VITE_CACHE_BASE;
       const res = await fetch(
         `${base}/data-acceptance/index.php?endpoint=source-fetch&entity=${encodeURIComponent(
-          this.source.entity,
+          this.entity.source,
         )}&id=${encodeURIComponent(this.source.id)}`,
       );
+
       this.source.data = await res.json();
       this.source.loading = false;
     },
 
     async fetchTarget() {
-      if (!this.target.entity || !this.target.id) return;
+      if (!this.entity || !this.target.id) return;
       this.target.loading = true;
 
       const base = import.meta.env.VITE_CACHE_BASE;
       const res = await fetch(
         `${base}/data-acceptance/index.php?endpoint=target-fetch&entity=${encodeURIComponent(
-          this.target.entity,
+          this.entity.target,
         )}&id=${encodeURIComponent(this.target.id)}`,
       );
-      this.target.data = await res.json();
+
+      this.target._data = await res.json();
       this.target.loading = false;
     },
   },
