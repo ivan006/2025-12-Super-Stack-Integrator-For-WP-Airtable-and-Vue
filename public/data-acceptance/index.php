@@ -12,8 +12,8 @@ header('Access-Control-Allow-Methods: GET, OPTIONS');
 header('Access-Control-Allow-Headers: *');
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-  http_response_code(204);
-  exit;
+    http_response_code(204);
+    exit;
 }
 
 /**
@@ -22,22 +22,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
  * -------------------------------------------------
  */
 $configPath = __DIR__ . '/config.json';
-$envPath = __DIR__ . '/env.json';
+$envPath    = __DIR__ . '/env.json';
 
-if (!file_exists($configPath)) {
-  http_response_code(500);
-  echo json_encode(['error' => 'Missing config.json']);
-  exit;
+if (! file_exists($configPath)) {
+    http_response_code(500);
+    echo json_encode(['error' => 'Missing config.json']);
+    exit;
 }
 
-if (!file_exists($envPath)) {
-  http_response_code(500);
-  echo json_encode(['error' => 'Missing env.json']);
-  exit;
+if (! file_exists($envPath)) {
+    http_response_code(500);
+    echo json_encode(['error' => 'Missing env.json']);
+    exit;
 }
 
 $config = json_decode(file_get_contents($configPath), true);
-$env = json_decode(file_get_contents($envPath), true);
+$env    = json_decode(file_get_contents($envPath), true);
 
 /**
  * -------------------------------------------------
@@ -46,45 +46,45 @@ $env = json_decode(file_get_contents($envPath), true);
  */
 function fetchSource($env, $entity, $id)
 {
-  $entityMap = null;
-  foreach ($env['entities'] as $e) {
-    if (($e['source_entity_name'] ?? null) === $entity) {
-      $entityMap = $e;
-      break;
+    $entityMap = null;
+    foreach ($env['entities'] as $e) {
+        if (($e['source_entity_name'] ?? null) === $entity) {
+            $entityMap = $e;
+            break;
+        }
     }
-  }
 
-  if (!$entityMap) {
-    http_response_code(404);
-    echo json_encode(['error' => 'Source entity not allowed']);
-    exit;
-  }
+    if (! $entityMap) {
+        http_response_code(404);
+        echo json_encode(['error' => 'Source entity not allowed']);
+        exit;
+    }
 
-  $baseUrl = rtrim($env['source']['base_url'], '/');
-  $url = $baseUrl . '/' . rawurlencode($entity) . '/' . rawurlencode($id);
+    $baseUrl = rtrim($env['source']['base_url'], '/');
+    $url     = $baseUrl . '/' . rawurlencode($entity) . '/' . rawurlencode($id);
 
-  $client = new CurlClient(false);
-  $bodyStream = fopen('php://temp', 'w+');
+    $client     = new CurlClient(false);
+    $bodyStream = fopen('php://temp', 'w+');
 
-  $info = $client->get($url, [], $bodyStream);
+    $info = $client->get($url, [], $bodyStream);
 
-  if (!$info || ($info['http_code'] ?? 500) >= 400) {
-    http_response_code(502);
-    echo json_encode(['error' => 'Failed to fetch source record']);
-    exit;
-  }
+    if (! $info || ($info['http_code'] ?? 500) >= 400) {
+        http_response_code(502);
+        echo json_encode(['error' => 'Failed to fetch source record']);
+        exit;
+    }
 
-  rewind($bodyStream);
-  $raw = stream_get_contents($bodyStream);
-  fclose($bodyStream);
+    rewind($bodyStream);
+    $raw = stream_get_contents($bodyStream);
+    fclose($bodyStream);
 
-  $data = json_decode($raw, true);
+    $data = json_decode($raw, true);
 
-  return [
-    'entityMap' => $entityMap,
-    'raw'  => $data,
-    'norm' => normalizeStructure($data, $entityMap, 'source'),
-  ];
+    return [
+        'entityMap' => $entityMap,
+        'raw'       => $data,
+        'norm'      => normalizeStructure($data, $entityMap, 'source'),
+    ];
 }
 
 /**
@@ -94,37 +94,37 @@ function fetchSource($env, $entity, $id)
  */
 function createTarget($config, $env, $entityMap, $normData)
 {
-  $url =
+    $url =
     rtrim($env['target']['base_url'], '/')
     . '/' . rawurlencode($env['target']['base_id'])
     . '/' . rawurlencode($entityMap['target_entity_name']);
 
-  $host = parse_url($url, PHP_URL_HOST);
-  $headers = [];
+    $host    = parse_url($url, PHP_URL_HOST);
+    $headers = [];
 
-  foreach ($config[$host]['headers'] as $k => $v) {
-    $headers[] = "$k: $v";
-  }
-  $headers[] = 'Content-Type: application/json';
+    foreach ($config[$host]['headers'] as $k => $v) {
+        $headers[] = "$k: $v";
+    }
+    $headers[] = 'Content-Type: application/json';
 
-  $payload = json_encode(['fields' => $normData]);
+    $payload = json_encode(['fields' => $normData]);
 
-  $client = new CurlClient(false);
-  $bodyStream = fopen('php://temp', 'w+');
+    $client     = new CurlClient(false);
+    $bodyStream = fopen('php://temp', 'w+');
 
-  $info = $client->post($url, $headers, $payload, $bodyStream);
+    $info = $client->post($url, $headers, $payload, $bodyStream);
 
-  rewind($bodyStream);
-  $resp = json_decode(stream_get_contents($bodyStream), true);
-  fclose($bodyStream);
+    rewind($bodyStream);
+    $resp = json_decode(stream_get_contents($bodyStream), true);
+    fclose($bodyStream);
 
-  if (!$info || !in_array($info['http_code'], [200, 201], true)) {
-    http_response_code(502);
-    echo json_encode(['error' => 'Failed to create target']);
-    exit;
-  }
+    if (! $info || ! in_array($info['http_code'], [200, 201], true)) {
+        http_response_code(502);
+        echo json_encode(['error' => 'Failed to create target']);
+        exit;
+    }
 
-  return $resp;
+    return $resp;
 }
 
 /**
@@ -134,38 +134,38 @@ function createTarget($config, $env, $entityMap, $normData)
  */
 function updateTarget($config, $env, $entityMap, $targetId, $normData)
 {
-  $url =
+    $url =
     rtrim($env['target']['base_url'], '/')
     . '/' . rawurlencode($env['target']['base_id'])
     . '/' . rawurlencode($entityMap['target_entity_name'])
     . '/' . rawurlencode($targetId);
 
-  $host = parse_url($url, PHP_URL_HOST);
-  $headers = [];
+    $host    = parse_url($url, PHP_URL_HOST);
+    $headers = [];
 
-  foreach ($config[$host]['headers'] as $k => $v) {
-    $headers[] = "$k: $v";
-  }
-  $headers[] = 'Content-Type: application/json';
+    foreach ($config[$host]['headers'] as $k => $v) {
+        $headers[] = "$k: $v";
+    }
+    $headers[] = 'Content-Type: application/json';
 
-  $payload = json_encode(['fields' => $normData]);
+    $payload = json_encode(['fields' => $normData]);
 
-  $client = new CurlClient(false);
-  $bodyStream = fopen('php://temp', 'w+');
+    $client     = new CurlClient(false);
+    $bodyStream = fopen('php://temp', 'w+');
 
-  $info = $client->patch($url, $headers, $payload, $bodyStream);
+    $info = $client->patch($url, $headers, $payload, $bodyStream);
 
-  rewind($bodyStream);
-  $resp = json_decode(stream_get_contents($bodyStream), true);
-  fclose($bodyStream);
+    rewind($bodyStream);
+    $resp = json_decode(stream_get_contents($bodyStream), true);
+    fclose($bodyStream);
 
-  if (!$info || $info['http_code'] !== 200) {
-    http_response_code(502);
-    echo json_encode(['error' => 'Failed to update target']);
-    exit;
-  }
+    if (! $info || $info['http_code'] !== 200) {
+        http_response_code(502);
+        echo json_encode(['error' => 'Failed to update target']);
+        exit;
+    }
 
-  return $resp;
+    return $resp;
 }
 
 /**
@@ -181,8 +181,8 @@ $endpoint = $_GET['endpoint'] ?? null;
  * -------------------------------------------------
  */
 if ($endpoint === 'configs-fetch') {
-  echo json_encode(['entities' => $env['entities'] ?? []], JSON_PRETTY_PRINT);
-  exit;
+    echo json_encode(['entities' => $env['entities'] ?? []], JSON_PRETTY_PRINT);
+    exit;
 }
 
 /**
@@ -192,25 +192,25 @@ if ($endpoint === 'configs-fetch') {
  */
 elseif ($endpoint === 'source-fetch') {
 
-  $entity = $_GET['entity'] ?? null;
-  $id = $_GET['id'] ?? null;
+    $entity = $_GET['entity'] ?? null;
+    $id     = $_GET['id'] ?? null;
 
-  if (!$entity || !$id) {
-    http_response_code(400);
-    echo json_encode(['error' => 'Missing entity or id']);
+    if (! $entity || ! $id) {
+        http_response_code(400);
+        echo json_encode(['error' => 'Missing entity or id']);
+        exit;
+    }
+
+    $res = fetchSource($env, $entity, $id);
+
+    echo json_encode([
+        'system'    => 'source',
+        'entity'    => $entity,
+        'id'        => $id,
+        'norm_data' => $res['norm'],
+        'raw_data'  => $res['raw'],
+    ], JSON_PRETTY_PRINT);
     exit;
-  }
-
-  $res = fetchSource($env, $entity, $id);
-
-  echo json_encode([
-    'system' => 'source',
-    'entity' => $entity,
-    'id' => $id,
-    'norm_data' => $res['norm'],
-    'raw_data' => $res['raw']
-  ], JSON_PRETTY_PRINT);
-  exit;
 }
 
 /**
@@ -220,91 +220,91 @@ elseif ($endpoint === 'source-fetch') {
  */
 elseif ($endpoint === 'target-fetch') {
 
-  $entity = $_GET['entity'] ?? null;
-  $id = $_GET['id'] ?? null;
+    $entity = $_GET['entity'] ?? null;
+    $id     = $_GET['id'] ?? null;
 
-  if (!$entity || !$id) {
-    http_response_code(400);
-    echo json_encode(['error' => 'Missing entity or id']);
-    exit;
-  }
-
-  $entityMap = null;
-  foreach ($env['entities'] as $e) {
-    if (($e['target_entity_name'] ?? null) === $entity) {
-      $entityMap = $e;
-      break;
+    if (! $entity || ! $id) {
+        http_response_code(400);
+        echo json_encode(['error' => 'Missing entity or id']);
+        exit;
     }
-  }
 
-  if (!$entityMap) {
-    http_response_code(404);
-    echo json_encode(['error' => 'Entity not allowed']);
-    exit;
-  }
+    $entityMap = null;
+    foreach ($env['entities'] as $e) {
+        if (($e['target_entity_name'] ?? null) === $entity) {
+            $entityMap = $e;
+            break;
+        }
+    }
 
-  $baseUrl = rtrim($env['target']['base_url'], '/');
-  $baseId = $env['target']['base_id'];
-  $table = $entityMap['target_entity_name'];
+    if (! $entityMap) {
+        http_response_code(404);
+        echo json_encode(['error' => 'Entity not allowed']);
+        exit;
+    }
 
-  $url =
+    $baseUrl = rtrim($env['target']['base_url'], '/');
+    $baseId  = $env['target']['base_id'];
+    $table   = $entityMap['target_entity_name'];
+
+    $url =
     $baseUrl . '/' .
     rawurlencode($baseId) . '/' .
     rawurlencode($table) . '/' .
     rawurlencode($id);
 
-  $host = parse_url($url, PHP_URL_HOST);
-  if (!isset($config[$host]['headers'])) {
-    http_response_code(500);
-    echo json_encode(['error' => 'No auth config for host']);
-    exit;
-  }
+    $host = parse_url($url, PHP_URL_HOST);
+    if (! isset($config[$host]['headers'])) {
+        http_response_code(500);
+        echo json_encode(['error' => 'No auth config for host']);
+        exit;
+    }
 
-  $headers = [];
-  foreach ($config[$host]['headers'] as $k => $v) {
-    $headers[] = $k . ': ' . $v;
-  }
+    $headers = [];
+    foreach ($config[$host]['headers'] as $k => $v) {
+        $headers[] = $k . ': ' . $v;
+    }
 
-  $client = new CurlClient(false);
-  $bodyStream = fopen('php://temp', 'w+');
+    $client     = new CurlClient(false);
+    $bodyStream = fopen('php://temp', 'w+');
 
-  $info = $client->get($url, $headers, $bodyStream);
+    $info = $client->get($url, $headers, $bodyStream);
 
-  rewind($bodyStream);
-  $raw = stream_get_contents($bodyStream);
-  fclose($bodyStream);
+    rewind($bodyStream);
+    $raw = stream_get_contents($bodyStream);
+    fclose($bodyStream);
 
-  if (!$info || ($info['http_code'] ?? 500) >= 400) {
-    http_response_code(502);
+    if (! $info || ($info['http_code'] ?? 500) >= 400) {
+        http_response_code(502);
+        echo json_encode([
+            'error'         => 'Failed to fetch target record',
+            'http_code'     => $info['http_code'] ?? null,
+            'attempted_url' => $url,
+        ], JSON_PRETTY_PRINT);
+        exit;
+    }
+
+    $data = json_decode($raw, true);
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        http_response_code(500);
+        echo json_encode([
+            'error'      => 'JSON decode failed',
+            'json_error' => json_last_error_msg(),
+            'raw_body'   => $raw,
+        ], JSON_PRETTY_PRINT);
+        exit;
+    }
+
+    $normData = normalizeStructure($data, $entityMap, 'target');
+
     echo json_encode([
-      'error' => 'Failed to fetch target record',
-      'http_code' => $info['http_code'] ?? null,
-      'attempted_url' => $url
+        'system'    => 'target',
+        'entity'    => $entity,
+        'id'        => $id,
+        'norm_data' => $normData,
+        'raw_data'  => $data,
     ], JSON_PRETTY_PRINT);
     exit;
-  }
-
-  $data = json_decode($raw, true);
-  if (json_last_error() !== JSON_ERROR_NONE) {
-    http_response_code(500);
-    echo json_encode([
-      'error' => 'JSON decode failed',
-      'json_error' => json_last_error_msg(),
-      'raw_body' => $raw
-    ], JSON_PRETTY_PRINT);
-    exit;
-  }
-
-  $normData = normalizeStructure($data, $entityMap, 'target');
-
-  echo json_encode([
-    'system' => 'target',
-    'entity' => $entity,
-    'id' => $id,
-    'norm_data' => $normData,
-    'raw_data' => $data
-  ], JSON_PRETTY_PRINT);
-  exit;
 }
 
 /**
@@ -314,33 +314,33 @@ elseif ($endpoint === 'target-fetch') {
  */
 elseif ($endpoint === 'source-fetch-and-sync-with-create-or-update') {
 
-  $entity = $_GET['entity'] ?? null;
-  $sourceId = $_GET['id'] ?? null;
-  $targetId = $_GET['target_id'] ?? null;
+    $entity   = $_GET['entity'] ?? null;
+    $sourceId = $_GET['id'] ?? null;
+    $targetId = $_GET['target_id'] ?? null;
 
-  if (!$entity || !$sourceId) {
-    http_response_code(400);
-    echo json_encode(['error' => 'Missing entity or source id']);
+    if (! $entity || ! $sourceId) {
+        http_response_code(400);
+        echo json_encode(['error' => 'Missing entity or source id']);
+        exit;
+    }
+
+    $source = fetchSource($env, $entity, $sourceId);
+
+    if ($targetId) {
+        $result = updateTarget($config, $env, $source['entityMap'], $targetId, $source['norm']);
+        $mode   = 'update';
+    } else {
+        $result = createTarget($config, $env, $source['entityMap'], $source['norm']);
+        $mode   = 'create';
+    }
+
+    echo json_encode([
+        'mode'      => $mode,
+        'entity'    => $entity,
+        'source_id' => $sourceId,
+        'target'    => $result,
+    ], JSON_PRETTY_PRINT);
     exit;
-  }
-
-  $source = fetchSource($env, $entity, $sourceId);
-
-  if ($targetId) {
-    $result = updateTarget($config, $env, $source['entityMap'], $targetId, $source['norm']);
-    $mode = 'update';
-  } else {
-    $result = createTarget($config, $env, $source['entityMap'], $source['norm']);
-    $mode = 'create';
-  }
-
-  echo json_encode([
-    'mode' => $mode,
-    'entity' => $entity,
-    'source_id' => $sourceId,
-    'target' => $result
-  ], JSON_PRETTY_PRINT);
-  exit;
 }
 
 /**
@@ -349,7 +349,7 @@ elseif ($endpoint === 'source-fetch-and-sync-with-create-or-update') {
  * -------------------------------------------------
  */
 else {
-  http_response_code(404);
-  echo json_encode(['error' => 'Unknown endpoint']);
-  exit;
+    http_response_code(404);
+    echo json_encode(['error' => 'Unknown endpoint']);
+    exit;
 }
