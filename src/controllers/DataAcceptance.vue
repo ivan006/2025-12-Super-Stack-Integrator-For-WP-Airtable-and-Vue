@@ -27,7 +27,7 @@
             <div class="text-subtitle1 q-mb-sm">Source</div>
 
             <q-input
-              v-model="source.id"
+              v-model="sourceId"
               label="Source ID"
               outlined
               dense
@@ -35,6 +35,7 @@
             />
 
             <q-btn
+              :disable="!entity || !sourceId"
               label="Fetch Source"
               color="secondary"
               unelevated
@@ -52,7 +53,7 @@
             <div class="text-subtitle1 q-mb-sm">Target</div>
 
             <q-input
-              v-model="target.id"
+              v-model="targetId"
               label="Target ID"
               outlined
               dense
@@ -60,6 +61,7 @@
             />
 
             <q-btn
+              :disable="!entity || !targetId"
               label="Fetch Target"
               color="primary"
               unelevated
@@ -127,13 +129,11 @@ export default {
       entity: null,
 
       source: {
-        id: "",
         data: null,
         loading: false,
       },
 
       target: {
-        id: "",
         loading: false,
         _data: null,
       },
@@ -143,6 +143,38 @@ export default {
   },
 
   computed: {
+    sourceId: {
+      get() {
+        return this.$route.params.sourceId === "none"
+          ? ""
+          : this.$route.params.sourceId || "";
+      },
+      set(val) {
+        this.$router.replace({
+          params: {
+            ...this.$route.params,
+            sourceId: val && val !== "" ? String(val) : "none",
+          },
+        });
+      },
+    },
+
+    targetId: {
+      get() {
+        return this.$route.params.targetId === "none"
+          ? ""
+          : this.$route.params.targetId || "";
+      },
+      set(val) {
+        this.$router.replace({
+          params: {
+            ...this.$route.params,
+            targetId: val && val !== "" ? String(val) : "none",
+          },
+        });
+      },
+    },
+
     targetData() {
       return this.target._data;
     },
@@ -170,14 +202,17 @@ export default {
     },
 
     async fetchSource() {
-      if (!this.entity || !this.source.id) return;
+      console.log(123);
+      console.log(this.entity);
+      console.log(this.sourceId);
+      if (!this.entity || this.sourceId === "none") return;
       this.source.loading = true;
 
       const base = import.meta.env.VITE_CACHE_BASE;
       const res = await fetch(
         `${base}/data-acceptance/index.php?endpoint=source-fetch&entity=${encodeURIComponent(
           this.entity.source,
-        )}&id=${encodeURIComponent(this.source.id)}`,
+        )}&id=${encodeURIComponent(this.sourceId)}`,
       );
 
       this.source.data = await res.json();
@@ -185,14 +220,14 @@ export default {
     },
 
     async fetchTarget() {
-      if (!this.entity || !this.target.id) return;
+      if (!this.entity || this.targetId === "none") return;
       this.target.loading = true;
 
       const base = import.meta.env.VITE_CACHE_BASE;
       const res = await fetch(
         `${base}/data-acceptance/index.php?endpoint=target-fetch&entity=${encodeURIComponent(
           this.entity.target,
-        )}&id=${encodeURIComponent(this.target.id)}`,
+        )}&id=${encodeURIComponent(this.targetId)}`,
       );
 
       this.target._data = await res.json();

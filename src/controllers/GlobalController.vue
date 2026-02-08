@@ -21,7 +21,10 @@
           <q-item-section> HTML Cache (Page List) </q-item-section>
         </q-item>
 
-        <q-item clickable to="/data-acceptance-page">
+        <q-item
+          clickable
+          to="/data-acceptance-page/source-id/none/target-id/none"
+        >
           <q-item-section> Data Acceptance </q-item-section>
         </q-item>
       </q-list>
