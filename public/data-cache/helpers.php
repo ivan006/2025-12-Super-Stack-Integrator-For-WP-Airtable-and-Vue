@@ -127,3 +127,46 @@ function normalizeStructure($rawData, $entityMap, $system)
 
     return $norm;
 }
+
+/**
+ * -------------------------------------------------
+ * Target Payload Builder (norm → Airtable fields)
+ * -------------------------------------------------
+ */
+function buildTargetPayloadFromNorm(array $normData, array $entityMap): array
+{
+    $fields = [];
+
+    foreach ($entityMap['fields'] as $field) {
+        if (! isset($field['norm_name'], $field['target_path'])) {
+            continue;
+        }
+
+        $normName = $field['norm_name'];
+
+        if (! array_key_exists($normName, $normData)) {
+            continue;
+        }
+
+        $value = $normData[$normName];
+
+        if ($value === null) {
+            continue;
+        }
+
+        // Extract Airtable field name from target_path
+        // Supports: fields.Name  OR  fields['Some Name']
+        if (preg_match("/^fields\.([A-Za-z0-9_]+)$/", $field['target_path'], $m)) {
+            $airtableField = $m[1];
+        } elseif (preg_match("/^fields\['(.+)'\]$/", $field['target_path'], $m)) {
+            $airtableField = $m[1];
+        } else {
+            // unsupported write path – skip silently
+            continue;
+        }
+
+        $fields[$airtableField] = $value;
+    }
+
+    return $fields;
+}
