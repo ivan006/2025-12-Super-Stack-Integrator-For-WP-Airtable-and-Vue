@@ -202,9 +202,6 @@ export default {
     },
 
     async fetchSource() {
-      console.log(123);
-      console.log(this.entity);
-      console.log(this.sourceId);
       if (!this.entity || this.sourceId === "none") return;
       this.source.loading = true;
 
