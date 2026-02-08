@@ -2,6 +2,10 @@
 
 ## General
 
+### UI and Code
+
+This project is built around a shared UI and helper layer that all integration tools plug into, rather than isolated sub-projects. A single Vue-based interface pattern is reused across features (fetching, inspecting, approving data), while PHP helpers provide common infrastructure for API requests, configuration, and persistence. New capabilities extend the system by adding focused helpers (e.g. database interaction) without re-implementing UI or transport logic. This keeps the system cohesive, extensible, and fast to evolve as new integration concerns are introduced.
+
 ### Overview
 
 This repository implements a super-stack integration strategy for WordPress, Airtable, and Vue.
