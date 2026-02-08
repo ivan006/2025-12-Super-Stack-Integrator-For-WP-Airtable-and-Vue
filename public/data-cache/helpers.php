@@ -128,11 +128,77 @@ function normalizeStructure($rawData, $entityMap, $system)
     return $norm;
 }
 
+function setPathValue(array &$root, string $path, $value): void
+{
+    // Strip leading "fields."
+    $path = preg_replace('/^fields\./', '', $path);
+
+    preg_match_all("/([A-Za-z0-9_ -]+|\['[^']+'\]|\[\d+\]|\[x\])/", $path, $m);
+    $tokens = $m[0];
+
+    $ref = &$root;
+
+    while (count($tokens) > 1) {
+        $token = array_shift($tokens);
+
+        // ['Some Key']
+        if (preg_match("/^\['(.+)'\]$/", $token, $mm)) {
+            $key = $mm[1];
+            if (! isset($ref[$key]) || ! is_array($ref[$key])) {
+                $ref[$key] = [];
+            }
+            $ref = &$ref[$key];
+            continue;
+        }
+
+        // [0] or [x]
+        if (preg_match("/^\[(\d+|x)\]$/", $token, $mm)) {
+            if (! is_array($ref)) {
+                $ref = [];
+            }
+
+            if ($mm[1] === 'x') {
+                $ref[] = [];
+                $ref   = &$ref[array_key_last($ref)];
+            } else {
+                $idx = (int) $mm[1];
+                if (! isset($ref[$idx]) || ! is_array($ref[$idx])) {
+                    $ref[$idx] = [];
+                }
+                $ref = &$ref[$idx];
+            }
+            continue;
+        }
+
+        // normal key
+        if (! isset($ref[$token]) || ! is_array($ref[$token])) {
+            $ref[$token] = [];
+        }
+        $ref = &$ref[$token];
+    }
+
+    // Final token → assign value
+    $final = array_shift($tokens);
+
+    if (preg_match("/^\['(.+)'\]$/", $final, $mm)) {
+        $ref[$mm[1]] = $value;
+    } elseif (preg_match("/^\[(\d+|x)\]$/", $final, $mm)) {
+        if ($mm[1] === 'x') {
+            $ref[] = $value;
+        } else {
+            $ref[(int) $mm[1]] = $value;
+        }
+    } else {
+        $ref[$final] = $value;
+    }
+}
+
 /**
  * -------------------------------------------------
  * Target Payload Builder (norm → Airtable fields)
  * -------------------------------------------------
  */
+
 function buildTargetPayloadFromNorm(array $normData, array $entityMap): array
 {
     $fields = [];
@@ -149,23 +215,11 @@ function buildTargetPayloadFromNorm(array $normData, array $entityMap): array
         }
 
         $value = $normData[$normName];
-
         if ($value === null) {
             continue;
         }
 
-        // Extract Airtable field name from target_path
-        // Supports: fields.Name  OR  fields['Some Name']
-        if (preg_match("/^fields\.([A-Za-z0-9_]+)$/", $field['target_path'], $m)) {
-            $airtableField = $m[1];
-        } elseif (preg_match("/^fields\['(.+)'\]$/", $field['target_path'], $m)) {
-            $airtableField = $m[1];
-        } else {
-            // unsupported write path – skip silently
-            continue;
-        }
-
-        $fields[$airtableField] = $value;
+        setPathValue($fields, $field['target_path'], $value);
     }
 
     return $fields;

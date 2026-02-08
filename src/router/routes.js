@@ -24,7 +24,7 @@ const routes = [
         meta: { requiresAuth: false },
       },
       {
-        path: "data-acceptance-page/source-id/:sourceId/target-id/:sourceId",
+        path: "data-acceptance-page/source-id/:sourceId/target-id/:targetId",
         component: () => import("src/controllers/DataAcceptance.vue"),
         meta: { requiresAuth: false },
       },
