@@ -42,6 +42,16 @@
               :loading="source.loading"
               @click="fetchSource"
             />
+
+            <q-btn
+              :disable="!entity || !sourceId"
+              label="Forward Sync"
+              color="positive"
+              unelevated
+              class="q-ml-sm"
+              :loading="source.loading"
+              @click="forwardSync"
+            />
           </q-card-section>
         </q-card>
       </div>
@@ -59,7 +69,6 @@
               dense
               class="q-mb-sm"
             />
-
             <q-btn
               :disable="!entity || !targetId"
               label="Fetch Target"
@@ -185,6 +194,40 @@ export default {
   },
 
   methods: {
+    async forwardSync() {
+      if (!this.entity || this.sourceId === "none") return;
+      this.source.loading = true;
+
+      const base = import.meta.env.VITE_CACHE_BASE;
+
+      const params = new URLSearchParams({
+        endpoint: "source-fetch-and-sync-with-create-or-update",
+        entity: this.entity.source,
+        id: this.sourceId,
+      });
+
+      if (this.targetId !== "none") {
+        params.set("target_id", this.targetId);
+      }
+
+      const res = await fetch(
+        `${base}/data-acceptance/index.php?${params.toString()}`,
+      );
+
+      const json = await res.json();
+
+      // hydrate both sides from authoritative response
+      this.source.data = json.source ?? this.source.data;
+      this.target._data = json.target ?? json;
+
+      // if a new target was created, lock it into the route
+      if (json.target_id) {
+        this.targetId = json.target_id;
+      }
+
+      this.source.loading = false;
+    },
+
     async loadConfigs() {
       const base = import.meta.env.VITE_CACHE_BASE;
       const res = await fetch(
