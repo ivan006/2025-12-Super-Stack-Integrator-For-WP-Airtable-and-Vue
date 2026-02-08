@@ -107,7 +107,9 @@ function createTarget($config, $env, $entityMap, $normData)
     }
     $headers[] = 'Content-Type: application/json';
 
-    $payload = json_encode(['fields' => $normData]);
+    $fields = buildTargetPayloadFromNorm($normData, $entityMap);
+
+    $payload = json_encode(['fields' => $fields]);
 
     $client     = new CurlClient(false);
     $bodyStream = fopen('php://temp', 'w+');
@@ -124,9 +126,8 @@ function createTarget($config, $env, $entityMap, $normData)
             'error'             => 'Failed to create target',
             'http_code'         => $info['http_code'] ?? null,
             'url'               => $url,
-            'payload'           => $normData,
+            'payload'           => $fields,
             'airtable_response' => $resp,
-            'headers'           => $info['headers'] ?? null,
         ], JSON_PRETTY_PRINT);
         exit;
     }
@@ -155,7 +156,9 @@ function updateTarget($config, $env, $entityMap, $targetId, $normData)
     }
     $headers[] = 'Content-Type: application/json';
 
-    $payload = json_encode(['fields' => $normData]);
+    $fields = buildTargetPayloadFromNorm($normData, $entityMap);
+
+    $payload = json_encode(['fields' => $fields]);
 
     $client     = new CurlClient(false);
     $bodyStream = fopen('php://temp', 'w+');
@@ -173,9 +176,8 @@ function updateTarget($config, $env, $entityMap, $targetId, $normData)
             'http_code'         => $info['http_code'] ?? null,
             'url'               => $url,
             'target_id'         => $targetId,
-            'payload'           => $normData,
+            'payload'           => $fields,
             'airtable_response' => $resp,
-            'headers'           => $info['headers'] ?? null,
         ], JSON_PRETTY_PRINT);
         exit;
     }
