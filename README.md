@@ -1,6 +1,8 @@
 # Ivan's Jamstack and Portal Integrator - For Wordpress, Airtable and Vue
 
-## Overview
+## General
+
+### Overview
 
 This repository implements a super-stack integration strategy for WordPress, Airtable, and Vue.
 
@@ -8,7 +10,7 @@ The core philosophy is spiritual integration over physical integration: instead 
 
 This approach prioritises rapid development, lower cost, and experimentation. By piggybacking on mature tools and integrating them cleanly, small teams can validate ideas faster without committing to heavy infrastructure upfront.
 
-## Rough Layout
+### Rough Layout
 
 portal -> data acceptance -> cms -> data caching -> site -> html caching -> seo
 
