@@ -120,7 +120,14 @@ function createTarget($config, $env, $entityMap, $normData)
 
     if (! $info || ! in_array($info['http_code'], [200, 201], true)) {
         http_response_code(502);
-        echo json_encode(['error' => 'Failed to create target']);
+        echo json_encode([
+            'error'             => 'Failed to create target',
+            'http_code'         => $info['http_code'] ?? null,
+            'url'               => $url,
+            'payload'           => $normData,
+            'airtable_response' => $resp,
+            'headers'           => $info['headers'] ?? null,
+        ], JSON_PRETTY_PRINT);
         exit;
     }
 
@@ -161,7 +168,15 @@ function updateTarget($config, $env, $entityMap, $targetId, $normData)
 
     if (! $info || $info['http_code'] !== 200) {
         http_response_code(502);
-        echo json_encode(['error' => 'Failed to update target']);
+        echo json_encode([
+            'error'             => 'Failed to update target',
+            'http_code'         => $info['http_code'] ?? null,
+            'url'               => $url,
+            'target_id'         => $targetId,
+            'payload'           => $normData,
+            'airtable_response' => $resp,
+            'headers'           => $info['headers'] ?? null,
+        ], JSON_PRETTY_PRINT);
         exit;
     }
 
