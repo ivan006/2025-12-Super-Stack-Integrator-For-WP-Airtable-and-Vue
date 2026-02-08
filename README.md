@@ -8,10 +8,8 @@ This project is built around a shared UI and helper layer that all integration t
 
 ### Overview
 
-This repository implements a super-stack integration strategy for WordPress, Airtable, and Vue.
-
-The core philosophy is spiritual integration over physical integration: instead of building monolithic systems or duplicating existing services, we compose proven platforms through explicit integration layers.
-
+This repository implements a super-stack integration strategy for WordPress, Airtable, and Vue.  
+The core philosophy is spiritual integration over physical integration: instead of building monolithic systems or duplicating existing services, we compose proven platforms through explicit integration layers.  
 This approach prioritises rapid development, lower cost, and experimentation. By piggybacking on mature tools and integrating them cleanly, small teams can validate ideas faster without committing to heavy infrastructure upfront.
 
 ### Rough Layout
