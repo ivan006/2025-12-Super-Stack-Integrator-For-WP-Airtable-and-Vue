@@ -92,7 +92,7 @@ function fetchSource($env, $entity, $id)
  * ADD: TARGET CREATE
  * -------------------------------------------------
  */
-function createTarget($config, $env, $entityMap, $normData)
+function createTarget($config, $env, $entityMap, $normData, bool $typecast = true)
 {
     $url =
     rtrim($env['target']['base_url'], '/')
@@ -109,16 +109,23 @@ function createTarget($config, $env, $entityMap, $normData)
 
     $fields = buildTargetPayloadFromNorm($normData, $entityMap);
 
-    $payload = json_encode(['fields' => $fields]);
+    $payloadArray = [
+        'fields'   => $fields,
+        'typecast' => $typecast,
+    ];
+
+    $payloadJson = json_encode($payloadArray);
 
     $client     = new CurlClient(false);
     $bodyStream = fopen('php://temp', 'w+');
 
-    $info = $client->post($url, $headers, $payload, $bodyStream);
+    $info = $client->post($url, $headers, $payloadJson, $bodyStream);
 
     rewind($bodyStream);
-    $resp = json_decode(stream_get_contents($bodyStream), true);
+    $respRaw = stream_get_contents($bodyStream);
     fclose($bodyStream);
+
+    $resp = json_decode($respRaw, true);
 
     if (! $info || ! in_array($info['http_code'], [200, 201], true)) {
         http_response_code(502);
@@ -126,8 +133,11 @@ function createTarget($config, $env, $entityMap, $normData)
             'error'             => 'Failed to create target',
             'http_code'         => $info['http_code'] ?? null,
             'url'               => $url,
-            'payload'           => $fields,
+            'headers'           => $headers,
+            'payload'           => $payloadArray,
+            'payload_json'      => $payloadJson,
             'airtable_response' => $resp,
+            'airtable_raw'      => $respRaw,
         ], JSON_PRETTY_PRINT);
         exit;
     }
@@ -140,7 +150,7 @@ function createTarget($config, $env, $entityMap, $normData)
  * ADD: TARGET UPDATE
  * -------------------------------------------------
  */
-function updateTarget($config, $env, $entityMap, $targetId, $normData)
+function updateTarget($config, $env, $entityMap, $targetId, $normData, bool $typecast = true)
 {
     $url =
     rtrim($env['target']['base_url'], '/')
@@ -158,16 +168,23 @@ function updateTarget($config, $env, $entityMap, $targetId, $normData)
 
     $fields = buildTargetPayloadFromNorm($normData, $entityMap);
 
-    $payload = json_encode(['fields' => $fields]);
+    $payloadArray = [
+        'fields'   => $fields,
+        'typecast' => $typecast,
+    ];
+
+    $payloadJson = json_encode($payloadArray);
 
     $client     = new CurlClient(false);
     $bodyStream = fopen('php://temp', 'w+');
 
-    $info = $client->patch($url, $headers, $payload, $bodyStream);
+    $info = $client->patch($url, $headers, $payloadJson, $bodyStream);
 
     rewind($bodyStream);
-    $resp = json_decode(stream_get_contents($bodyStream), true);
+    $respRaw = stream_get_contents($bodyStream);
     fclose($bodyStream);
+
+    $resp = json_decode($respRaw, true);
 
     if (! $info || $info['http_code'] !== 200) {
         http_response_code(502);
@@ -176,8 +193,11 @@ function updateTarget($config, $env, $entityMap, $targetId, $normData)
             'http_code'         => $info['http_code'] ?? null,
             'url'               => $url,
             'target_id'         => $targetId,
-            'payload'           => $fields,
+            'headers'           => $headers,
+            'payload'           => $payloadArray,
+            'payload_json'      => $payloadJson,
             'airtable_response' => $resp,
+            'airtable_raw'      => $respRaw,
         ], JSON_PRETTY_PRINT);
         exit;
     }
@@ -335,6 +355,10 @@ elseif ($endpoint === 'source-fetch-and-sync-with-create-or-update') {
     $sourceId = $_GET['id'] ?? null;
     $targetId = $_GET['target_id'] ?? null;
 
+    // INVERSE FLAG: typecast ON by default, disabled only if explicitly requested
+    $dontTypecast = isset($_GET['dont_typecast']) && $_GET['dont_typecast'] == '1';
+    $typecast     = ! $dontTypecast;
+
     if (! $entity || ! $sourceId) {
         http_response_code(400);
         echo json_encode(['error' => 'Missing entity or source id']);
@@ -344,18 +368,33 @@ elseif ($endpoint === 'source-fetch-and-sync-with-create-or-update') {
     $source = fetchSource($env, $entity, $sourceId);
 
     if ($targetId) {
-        $result = updateTarget($config, $env, $source['entityMap'], $targetId, $source['norm']);
-        $mode   = 'update';
+        $result = updateTarget(
+            $config,
+            $env,
+            $source['entityMap'],
+            $targetId,
+            $source['norm'],
+            $typecast
+        );
+        $mode = 'update';
     } else {
-        $result = createTarget($config, $env, $source['entityMap'], $source['norm']);
-        $mode   = 'create';
+        $result = createTarget(
+            $config,
+            $env,
+            $source['entityMap'],
+            $source['norm'],
+            $typecast
+        );
+        $mode = 'create';
     }
 
     echo json_encode([
-        'mode'      => $mode,
-        'entity'    => $entity,
-        'source_id' => $sourceId,
-        'target'    => $result,
+        'mode'          => $mode,
+        'entity'        => $entity,
+        'source_id'     => $sourceId,
+        'typecast'      => $typecast,
+        'dont_typecast' => $dontTypecast,
+        'target'        => $result,
     ], JSON_PRETTY_PRINT);
     exit;
 }
