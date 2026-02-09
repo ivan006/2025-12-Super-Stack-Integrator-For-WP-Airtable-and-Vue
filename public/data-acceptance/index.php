@@ -92,8 +92,10 @@ function fetchSource($env, $entity, $id)
  * ADD: TARGET CREATE
  * -------------------------------------------------
  */
-function createTarget($config, $env, $entityMap, $normData, bool $typecast = true)
+function createTarget($config, $env, $entityMap, $normData, bool $dontTypecast = false)
 {
+    $typecast = ! $dontTypecast;
+
     $url =
     rtrim($env['target']['base_url'], '/')
     . '/' . rawurlencode($env['target']['base_id'])
@@ -130,14 +132,16 @@ function createTarget($config, $env, $entityMap, $normData, bool $typecast = tru
     if (! $info || ! in_array($info['http_code'], [200, 201], true)) {
         http_response_code(502);
         echo json_encode([
-            'error'             => 'Failed to create target',
-            'http_code'         => $info['http_code'] ?? null,
-            'url'               => $url,
-            'headers'           => $headers,
-            'payload'           => $payloadArray,
-            'payload_json'      => $payloadJson,
-            'airtable_response' => $resp,
-            'airtable_raw'      => $respRaw,
+            'error'              => 'Failed to create target',
+            'http_code'          => $info['http_code'] ?? null,
+            'url'                => $url,
+            'headers'            => $headers,
+            'payload'            => $payloadArray,
+            'payload_json'       => $payloadJson,
+            'dont_typecast'      => $dontTypecast,
+            'effective_typecast' => $typecast,
+            'airtable_response'  => $resp,
+            'airtable_raw'       => $respRaw,
         ], JSON_PRETTY_PRINT);
         exit;
     }
@@ -150,8 +154,10 @@ function createTarget($config, $env, $entityMap, $normData, bool $typecast = tru
  * ADD: TARGET UPDATE
  * -------------------------------------------------
  */
-function updateTarget($config, $env, $entityMap, $targetId, $normData, bool $typecast = true)
+function updateTarget($config, $env, $entityMap, $targetId, $normData, bool $dontTypecast = false)
 {
+    $typecast = ! $dontTypecast;
+
     $url =
     rtrim($env['target']['base_url'], '/')
     . '/' . rawurlencode($env['target']['base_id'])
@@ -189,15 +195,17 @@ function updateTarget($config, $env, $entityMap, $targetId, $normData, bool $typ
     if (! $info || $info['http_code'] !== 200) {
         http_response_code(502);
         echo json_encode([
-            'error'             => 'Failed to update target',
-            'http_code'         => $info['http_code'] ?? null,
-            'url'               => $url,
-            'target_id'         => $targetId,
-            'headers'           => $headers,
-            'payload'           => $payloadArray,
-            'payload_json'      => $payloadJson,
-            'airtable_response' => $resp,
-            'airtable_raw'      => $respRaw,
+            'error'              => 'Failed to update target',
+            'http_code'          => $info['http_code'] ?? null,
+            'url'                => $url,
+            'target_id'          => $targetId,
+            'headers'            => $headers,
+            'payload'            => $payloadArray,
+            'payload_json'       => $payloadJson,
+            'dont_typecast'      => $dontTypecast,
+            'effective_typecast' => $typecast,
+            'airtable_response'  => $resp,
+            'airtable_raw'       => $respRaw,
         ], JSON_PRETTY_PRINT);
         exit;
     }
@@ -357,7 +365,6 @@ elseif ($endpoint === 'source-fetch-and-sync-with-create-or-update') {
 
     // INVERSE FLAG: typecast ON by default, disabled only if explicitly requested
     $dontTypecast = isset($_GET['dont_typecast']) && $_GET['dont_typecast'] == '1';
-    $typecast     = ! $dontTypecast;
 
     if (! $entity || ! $sourceId) {
         http_response_code(400);
@@ -374,7 +381,7 @@ elseif ($endpoint === 'source-fetch-and-sync-with-create-or-update') {
             $source['entityMap'],
             $targetId,
             $source['norm'],
-            $typecast
+            $dontTypecast
         );
         $mode = 'update';
     } else {
@@ -383,18 +390,18 @@ elseif ($endpoint === 'source-fetch-and-sync-with-create-or-update') {
             $env,
             $source['entityMap'],
             $source['norm'],
-            $typecast
+            $dontTypecast
         );
         $mode = 'create';
     }
 
     echo json_encode([
-        'mode'          => $mode,
-        'entity'        => $entity,
-        'source_id'     => $sourceId,
-        'typecast'      => $typecast,
-        'dont_typecast' => $dontTypecast,
-        'target'        => $result,
+        'mode'               => $mode,
+        'entity'             => $entity,
+        'source_id'          => $sourceId,
+        'dont_typecast'      => $dontTypecast,
+        'effective_typecast' => ! $dontTypecast,
+        'target'             => $result,
     ], JSON_PRETTY_PRINT);
     exit;
 }
